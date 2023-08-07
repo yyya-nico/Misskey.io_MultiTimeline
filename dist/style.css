@@ -53,8 +53,8 @@ body {
   scroll-behavior: smooth;
 }
 
-.flex .container #renotes-list > li > .renote-info,
-.flex .container #renotes-list > li > .renoted-note, .flex .container #notes-list > li {
+.grid .container #renotes-list > li > .renote-info,
+.grid .container #renotes-list > li > .renoted-note, .grid .container #notes-list > li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -62,18 +62,36 @@ body {
   padding: 5px 10px;
 }
 
-.flex {
-  display: flex;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   height: 100vh;
   height: 100dvh;
 }
-.flex .container {
-  width: 50%;
-  height: 100%;
+.grid .container {
   overflow-y: auto;
 }
-.flex .container .h-notes,
-.flex .container .h-renotes {
+.grid .container.notes {
+  grid-column: 1;
+  grid-row: 1/-1;
+}
+.grid .container.renotes {
+  grid-column: 3;
+  grid-row: 1;
+}
+.grid .container.media {
+  grid-column: 2;
+  grid-row: 1/-1;
+}
+.grid .container.rn-media {
+  grid-column: 3;
+  grid-row: 2;
+}
+.grid .container .h-notes,
+.grid .container .h-renotes,
+.grid .container .h-media,
+.grid .container .h-rn-media {
   position: sticky;
   top: 0;
   left: 0;
@@ -87,45 +105,45 @@ body {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
-.flex .container #notes-list,
-.flex .container #renotes-list {
+.grid .container #notes-list,
+.grid .container #renotes-list {
   list-style: none;
 }
-.flex .container #notes-list > li,
-.flex .container #renotes-list > li {
+.grid .container #notes-list > li,
+.grid .container #renotes-list > li {
   animation: flash 0.2s linear;
 }
-.flex .container #notes-list > li .wrap,
-.flex .container #renotes-list > li .wrap {
+.grid .container #notes-list > li .wrap,
+.grid .container #renotes-list > li .wrap {
   flex-grow: 1;
   overflow: hidden;
   white-space: nowrap;
   word-break: break-all;
   text-overflow: ellipsis;
 }
-.flex .container #notes-list > li .wrap.is-open,
-.flex .container #renotes-list > li .wrap.is-open {
+.grid .container #notes-list > li .wrap.is-open,
+.grid .container #renotes-list > li .wrap.is-open {
   white-space: normal;
 }
-.flex .container #notes-list > li .wrap.is-open .text br,
-.flex .container #renotes-list > li .wrap.is-open .text br {
+.grid .container #notes-list > li .wrap.is-open .text br,
+.grid .container #renotes-list > li .wrap.is-open .text br {
   display: inline;
 }
-.flex .container #notes-list > li .wrap > .name .custom-emoji,
-.flex .container #notes-list > li .wrap > .text .custom-emoji,
-.flex .container #renotes-list > li .wrap > .name .custom-emoji,
-.flex .container #renotes-list > li .wrap > .text .custom-emoji {
+.grid .container #notes-list > li .wrap > .name .custom-emoji,
+.grid .container #notes-list > li .wrap > .text .custom-emoji,
+.grid .container #renotes-list > li .wrap > .name .custom-emoji,
+.grid .container #renotes-list > li .wrap > .text .custom-emoji {
   height: 1.48em;
   vertical-align: -0.3em;
 }
-.flex .container #notes-list > li .wrap > .name > .file-count,
-.flex .container #notes-list > li .wrap > .text > .file-count,
-.flex .container #renotes-list > li .wrap > .name > .file-count,
-.flex .container #renotes-list > li .wrap > .text > .file-count {
+.grid .container #notes-list > li .wrap > .name > .file-count,
+.grid .container #notes-list > li .wrap > .text > .file-count,
+.grid .container #renotes-list > li .wrap > .name > .file-count,
+.grid .container #renotes-list > li .wrap > .text > .file-count {
   color: #aaaaaa;
 }
-.flex .container #notes-list > li .wrap > .name,
-.flex .container #renotes-list > li .wrap > .name {
+.grid .container #notes-list > li .wrap > .name,
+.grid .container #renotes-list > li .wrap > .name {
   display: inline-block;
   overflow: hidden;
   max-width: 15em;
@@ -134,65 +152,161 @@ body {
   vertical-align: top;
   text-overflow: ellipsis;
 }
-.flex .container #notes-list > li .wrap > .name > .custom-emoji,
-.flex .container #renotes-list > li .wrap > .name > .custom-emoji {
+.grid .container #notes-list > li .wrap > .name > .custom-emoji,
+.grid .container #renotes-list > li .wrap > .name > .custom-emoji {
   filter: brightness(0.5);
 }
 @media (max-width: 767px) {
-  .flex .container #notes-list > li .wrap > .name,
-  .flex .container #renotes-list > li .wrap > .name {
+  .grid .container #notes-list > li .wrap > .name,
+  .grid .container #renotes-list > li .wrap > .name {
     max-width: 7em;
   }
 }
-.flex .container #notes-list > li .wrap > .text,
-.flex .container #renotes-list > li .wrap > .text {
+.grid .container #notes-list > li .wrap > .text,
+.grid .container #renotes-list > li .wrap > .text {
   margin-left: 10px;
 }
-.flex .container #notes-list > li .wrap > .text .nothing,
-.flex .container #renotes-list > li .wrap > .text .nothing {
+.grid .container #notes-list > li .wrap > .text .nothing,
+.grid .container #renotes-list > li .wrap > .text .nothing {
   color: #7f7f7f;
 }
-.flex .container #notes-list > li .wrap > .text .cwtext,
-.flex .container #renotes-list > li .wrap > .text .cwtext {
+.grid .container #notes-list > li .wrap > .text .cwtext,
+.grid .container #renotes-list > li .wrap > .text .cwtext {
   color: #7f7f7f;
 }
-.flex .container #notes-list > li .wrap > .text .cwtext > .custom-emoji,
-.flex .container #renotes-list > li .wrap > .text .cwtext > .custom-emoji {
+.grid .container #notes-list > li .wrap > .text .cwtext > .custom-emoji,
+.grid .container #renotes-list > li .wrap > .text .cwtext > .custom-emoji {
   filter: brightness(0.5);
 }
-.flex .container #notes-list > li .wrap > .text br,
-.flex .container #renotes-list > li .wrap > .text br {
+.grid .container #notes-list > li .wrap > .text br,
+.grid .container #renotes-list > li .wrap > .text br {
   display: none;
 }
-.flex .container #notes-list > li .time,
-.flex .container #renotes-list > li .time {
+.grid .container #notes-list > li .time,
+.grid .container #renotes-list > li .time {
   flex-shrink: 0;
   align-self: flex-end;
   color: #7f7f7f;
   text-decoration: none;
 }
-.flex .container #notes-list > li .time:hover,
-.flex .container #renotes-list > li .time:hover {
+.grid .container #notes-list > li .time:hover,
+.grid .container #renotes-list > li .time:hover {
   text-decoration: underline;
 }
-.flex .container #renotes-list > li > .renote-info {
+.grid .container #renotes-list > li > .renote-info {
   padding: 5px 10px 2px;
 }
-.flex .container #renotes-list > li > .renote-info > .wrap > .name {
+.grid .container #renotes-list > li > .renote-info > .wrap > .name {
   color: #b4e900;
 }
-.flex .container #renotes-list > li > .renote-info > .wrap > .name > .custom-emoji {
+.grid .container #renotes-list > li > .renote-info > .wrap > .name > .custom-emoji {
   filter: opacity(0.5) drop-shadow(0 0 0 #b4e900) brightness(1.25);
 }
-.flex .container #renotes-list > li > .renoted-note {
+.grid .container #renotes-list > li > .renoted-note {
   padding: 2px 20px 5px;
 }
-.flex .container [id$=-latest] {
+.grid .container #media-list,
+.grid .container #rn-media-list {
+  list-style: none;
+}
+.grid .container #media-list > li,
+.grid .container #rn-media-list > li {
+  width: calc(33% - 20px);
+  height: -moz-fit-content;
+  height: fit-content;
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: #333333;
+}
+.grid .container #media-list > li > a,
+.grid .container #rn-media-list > li > a {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: -moz-fit-content;
+  height: fit-content;
+  color: inherit;
+  text-decoration: none;
+}
+.grid .container #media-list > li > a:has(.more-file-count)::after,
+.grid .container #rn-media-list > li > a:has(.more-file-count)::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.75), transparent 100px);
+  pointer-events: none;
+  content: "";
+}
+.grid .container #media-list > li > a > img,
+.grid .container #rn-media-list > li > a > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.grid .container #media-list > li > a > img.is-sensitive,
+.grid .container #rn-media-list > li > a > img.is-sensitive {
+  transition: filter 0.5s linear;
+  filter: blur(20px);
+}
+.grid .container #media-list > li > a > img.is-sensitive:hover,
+.grid .container #rn-media-list > li > a > img.is-sensitive:hover {
+  filter: none;
+}
+.grid .container #media-list > li > a > img[src=""],
+.grid .container #rn-media-list > li > a > img[src=""] {
+  display: none;
+}
+.grid .container #media-list > li > a > .is-video,
+.grid .container #rn-media-list > li > a > .is-video {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 1;
+}
+.grid .container #media-list > li > a > .more-file-count,
+.grid .container #rn-media-list > li > a > .more-file-count {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  z-index: 1;
+}
+.grid .container #media-list > li > .text,
+.grid .container #rn-media-list > li > .text {
+  padding: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+}
+.grid .container #media-list > li > .text br,
+.grid .container #rn-media-list > li > .text br {
+  display: none;
+}
+.grid .container #media-list > li > .text .custom-emoji,
+.grid .container #rn-media-list > li > .text .custom-emoji {
+  height: 1.48em;
+  vertical-align: -0.3em;
+}
+.grid .container #media-list > li > .text .nothing,
+.grid .container #rn-media-list > li > .text .nothing {
+  color: #7f7f7f;
+}
+.grid .container #media-list > li > .text .cwtext,
+.grid .container #rn-media-list > li > .text .cwtext {
+  color: #7f7f7f;
+}
+.grid .container #media-list > li > .text .cwtext > .custom-emoji,
+.grid .container #rn-media-list > li > .text .cwtext > .custom-emoji {
+  filter: brightness(0.5);
+}
+.grid .container [id$=-latest] {
   display: block;
   visibility: hidden;
   opacity: 0;
   position: sticky;
-  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   margin-top: -40px;
@@ -203,17 +317,30 @@ body {
   color: inherit;
   transition: all 0.5s linear;
 }
-.flex .container [id$=-latest].show {
+.grid .container [id$=-latest].show {
   visibility: visible;
   opacity: 1;
 }
+.grid .container #note-latest,
+.grid .container #renote-latest {
+  bottom: 10px;
+}
+.grid .container #medium-latest,
+.grid .container #rn-medium-latest {
+  bottom: calc(100% - 40px - 56px - 10px);
+}
 @media (max-width: 1023px) {
-  .flex {
+  .grid {
+    grid-template-columns: repeat(4, 90%);
+    grid-template-rows: 1fr;
     overflow-x: auto;
   }
-  .flex .container {
-    flex-shrink: 0;
-    width: 90%;
+  .grid .container {
+    width: 100%;
+  }
+  .grid .container.notes, .grid .container.renotes, .grid .container.media, .grid .container.rn-media {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misskey.io 1行タイムライン</title>
+    <title>Misskey.io マルチタイムライン</title>
     <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192x192.png">
     <link rel="manifest" href="manifest.json">
     <link rel="manifest" href="manifest.webmanifest">
@@ -19,18 +19,30 @@
     </script>
 </head>
 <body>
-    <div class="flex">
+    <div class="grid">
         <div class="container notes">
             <header class="h-notes">最新のノート</header>
             <ul id="notes-list">
             </ul>
             <button id="note-latest">新しいノートを見る</button>
         </div>
+        <div class="container media">
+            <header class="h-media">最新のノートのメディア</header>
+            <ul id="media-list">
+            </ul>
+            <button id="medium-latest">新しいノートを見る</button>
+        </div>
         <div class="container renotes">
             <header class="h-renotes">評判のノート</header>
             <ul id="renotes-list">
             </ul>
             <button id="renote-latest">新しいノートを見る</button>
+        </div>
+        <div class="container rn-media">
+            <header class="h-rn-media">評判のノートのメディア</header>
+            <ul id="rn-media-list">
+            </ul>
+            <button id="rn-medium-latest">新しいノートを見る</button>
         </div>
     </div>
 </body>
