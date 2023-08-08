@@ -64,37 +64,13 @@ body {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 56px calc(50% - 56px) 50%;
   height: 100vh;
   height: 100dvh;
 }
-.grid .container {
-  overflow-y: auto;
-}
-.grid .container.notes {
-  grid-column: 1;
-  grid-row: 1/-1;
-}
-.grid .container.renotes {
-  grid-column: 3;
-  grid-row: 1;
-}
-.grid .container.media {
-  grid-column: 2;
-  grid-row: 1/-1;
-}
-.grid .container.rn-media {
-  grid-column: 3;
-  grid-row: 2;
-}
-.grid .container .h-notes,
-.grid .container .h-renotes,
-.grid .container .h-media,
-.grid .container .h-rn-media {
-  position: sticky;
-  top: 0;
-  left: 0;
+.grid .h-notes,
+.grid .h-renotes {
   z-index: 1;
   width: 100%;
   height: 56px;
@@ -104,6 +80,52 @@ body {
   line-height: 26px;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+}
+.grid .h-notes {
+  grid-column: 1;
+  grid-row: 1;
+}
+.grid .h-renotes {
+  grid-column: 2;
+  grid-row: 1;
+}
+.grid .container {
+  overflow-y: auto;
+}
+.grid .container.notes, .grid .container.renotes {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(31, 31, 31, 0.8);
+}
+.grid .container.notes > :first-child, .grid .container.renotes > :first-child {
+  margin-top: auto;
+}
+.grid .container.notes > [id$=-latest], .grid .container.renotes > [id$=-latest] {
+  align-self: baseline;
+}
+.grid .container.notes {
+  grid-column: 1;
+  grid-row: 3;
+  z-index: 1;
+}
+.grid .container.renotes {
+  grid-column: 2;
+  grid-row: 3;
+  z-index: 1;
+}
+.grid .container.media, .grid .container.rn-media {
+  padding-top: 56px;
+  padding-bottom: 50vh;
+}
+.grid .container.media {
+  grid-column: 1;
+  grid-row: 1/4;
+  z-index: 0;
+}
+.grid .container.rn-media {
+  grid-column: 2;
+  grid-row: 1/4;
+  z-index: 0;
 }
 .grid .container #notes-list,
 .grid .container #renotes-list {
@@ -331,20 +353,12 @@ body {
 }
 .grid .container #medium-latest,
 .grid .container #rn-medium-latest {
-  bottom: calc(100% - 40px - 56px - 10px);
+  bottom: calc(100% - 40px - 10px);
 }
 @media (max-width: 1023px) {
   .grid {
-    grid-template-columns: repeat(4, 90%);
-    grid-template-rows: 1fr;
+    grid-template-columns: repeat(2, 90%);
     overflow-x: auto;
-  }
-  .grid .container {
-    width: 100%;
-  }
-  .grid .container.notes, .grid .container.renotes, .grid .container.media, .grid .container.rn-media {
-    grid-column: auto;
-    grid-row: auto;
   }
 }
 
