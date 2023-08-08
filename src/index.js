@@ -194,19 +194,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     return html;
   };
 
-  const makeHTMLFromNoteForMedia = async note => {
+  const makeHTMLFromNoteForMedia = async (note, target) => {
     note.isRenote = Boolean(note.renoteId);
     const renote = note.isRenote ? note.renote : null;
-    const firstFile = !renote ? note.files[0] : renote.files[0];
+    const targetNote = target === 'note' && note || target === 'renote' && renote;
+    const firstFile = targetNote.files[0];
     const formatted = {
-      text:      await makeTextHTMLFromNote(!renote ? note : renote, renote && renote.host),
-      plainText: (note => {return note.cw ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(!renote ? note : renote),
-      fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(!renote ? note : renote),
+      text:      await makeTextHTMLFromNote(targetNote, renote && renote.host),
+      plainText: (note => {return note.cw ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(targetNote),
+      fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
     };
     const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
-        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || (!renote ? note.cw : renote.cw) ? 'is-sensitive' : ''}">
+        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || (targetNote.cw) ? 'is-sensitive' : ''}">
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
         ${formatted.fileCount}
       </a>${formatted.text &&`
@@ -269,16 +270,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (this === mediaList || this === rnMediaList) {
       if (isNote) {
         const note = noteOrNotes;
-        html = await makeHTMLFromNoteForMedia(note);
+        const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
+        html = await makeHTMLFromNoteForMedia(note, target);
         if (this === rnMediaList) {
           const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
           alreadyRN && alreadyRN.remove();
         }
       } else {
         const notes = noteOrNotes;
+        const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
         while (notes.length) {
           const note = notes.shift();
-          html = `${await makeHTMLFromNoteForMedia(note)}${html}`;
+          html = `${await makeHTMLFromNoteForMedia(note, target)}${html}`;
           // console.log('note shifted, notes count:', notes.length);
           if (this === rnMediaList) { // TODO: RN内容に複数重複があったときに最新のリノートを除いて除去したい
             const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
