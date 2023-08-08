@@ -266,6 +266,10 @@ body {
   left: 5px;
   z-index: 1;
 }
+.grid .container #media-list > li > a > .file-type,
+.grid .container #rn-media-list > li > a > .file-type {
+  padding: 5px;
+}
 .grid .container #media-list > li > a > .more-file-count,
 .grid .container #rn-media-list > li > a > .more-file-count {
   position: absolute;

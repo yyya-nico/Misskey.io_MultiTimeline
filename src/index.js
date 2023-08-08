@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     : firstFile.type.includes('audio') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
-        音声
+        <span class="file-type">音声</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
       <div class="text" title="${formatted.plainText}">
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     : 
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
-        その他:${firstFile.type}
+        <span class="file-type">その他:${firstFile.type}</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
       <div class="text" title="${formatted.plainText}">

@@ -294,6 +294,10 @@ body {
                         z-index: 1;
                     }
 
+                    >.file-type {
+                        padding: 5px;
+                    }
+
                     >.more-file-count {
                         position: absolute;
                         right: 5px;
