@@ -442,10 +442,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (containerRole === 'renotes') {
               await rnMediaList.appendToTl(stored.rnMedia);//RNMedia
             }
-          } else {
-            autoShowNew[containerRole === 'media' && 'medium' || containerRole === 'rn-media' && 'rnMedium'] = true;
-            latestBtn.classList.remove('show');
           }
+          autoShowNew[containerRole === 'media' && 'medium' || containerRole === 'rn-media' && 'rnMedium'] = true;
+          latestBtn.classList.remove('show');
         }
       }
     });
