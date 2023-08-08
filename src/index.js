@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
-        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive ? 'is-sensitive' : ''}">
+        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || (!renote ? note.cw : renote.cw) ? 'is-sensitive' : ''}">
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
         ${formatted.fileCount}
       </a>${formatted.text &&`
