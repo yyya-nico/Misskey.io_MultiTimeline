@@ -290,6 +290,7 @@ body {
 }
 .grid .container #media-list > li > a > .file-type,
 .grid .container #rn-media-list > li > a > .file-type {
+  display: block;
   padding: 5px;
 }
 .grid .container #media-list > li > a > .more-file-count,
