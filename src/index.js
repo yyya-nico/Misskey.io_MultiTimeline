@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         const deleteIndex = stored.rnMedia.findIndex(storedNote => storedNote.renoteId === note.renoteId);
         if (deleteIndex !== -1) {
-          stored.rnMedia.splice(deleteIndex, 0);
+          stored.rnMedia.splice(deleteIndex, 1);
         }
         stored.rnMedia.push(note);
         // console.log('rnMedia pushed, stored rnMedia count:',stored.rnMedia.length);
