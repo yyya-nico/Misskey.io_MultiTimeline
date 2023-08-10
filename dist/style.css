@@ -65,7 +65,7 @@ body {
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 56px calc(50% - 56px) 50%;
+  grid-template-rows: 56px calc(50% - 28px) calc(50% - 28px);
   height: 100vh;
   height: 100dvh;
 }
