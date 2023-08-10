@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // console.log(simpleMfmToHTML());
 
   const makeTextHTMLFromNote = async (note, host) => {
-    if (note.cw) {
+    if (note.cw !== null) {
       return `[CW]${await simpleMfmToHTML(htmlspecialchars(note.cw), host)} <span class="cwtext">${(await simpleMfmToHTML(htmlspecialchars(note.text), host)).replace(/\n/g, '<br>')}</span>`;
     } else if (note.text) {
       return (await simpleMfmToHTML(htmlspecialchars(note.text), host)).replace(/\n/g, '<br>');
@@ -201,13 +201,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstFile = targetNote.files[0];
     const formatted = {
       text:      await makeTextHTMLFromNote(targetNote, renote && renote.host),
-      plainText: (note => {return note.cw ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(targetNote),
+      plainText: (note => {return note.cw !== null ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(targetNote),
       fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
     };
     const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
-        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || (targetNote.cw) ? 'is-sensitive' : ''}">
+        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}">
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
         ${formatted.fileCount}
       </a>${formatted.text &&`
