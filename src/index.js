@@ -287,6 +287,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${renoteId}"]`);
             alreadyRN && alreadyRN.remove();
           });
+          console.log('stored rnMedia length:', notes.length, '\nlatest rnMedia length:', latestRenotes.length);
+          notes.length = 0;
         }
         (async notes => {
           while (notes.length) {
