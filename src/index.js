@@ -268,9 +268,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.firstElementChild.remove();
       }
     } else if (this === mediaList || this === rnMediaList) {
+      const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
       if (isNote) {
         const note = noteOrNotes;
-        const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
         if (target == 'renote') {
           const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
           alreadyRN && alreadyRN.remove();
@@ -278,25 +278,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         html = await makeHTMLFromNoteForMedia(note, target);
       } else {
         const notes = noteOrNotes;
-        const latestRenotes = [];
-        const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
-        if (target === 'renote') {
-          const renoteIds = new Set(notes.map(note => note.renoteId));
-          renoteIds.forEach(renoteId => {
-            latestRenotes.push(notes.findLast(note => note.renoteId === renoteId));
-            const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${renoteId}"]`);
+        while (notes.length) {
+          const note = notes.pop();
+          // console.log('note poped, notes count:', notes.length);
+          if (target == 'renote') {
+            const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
             alreadyRN && alreadyRN.remove();
-          });
-          console.log('stored rnMedia length:', notes.length, '\nlatest rnMedia length:', latestRenotes.length);
-          notes.length = 0;
-        }
-        (async notes => {
-          while (notes.length) {
-            const note = notes.shift();
-            // console.log('note shifted, notes count:', notes.length);
-            html = `${await makeHTMLFromNoteForMedia(note, target)}${html}`;
           }
-        })(target === 'note' && notes || target === 'renote' && latestRenotes);
+          html += await makeHTMLFromNoteForMedia(note, target);
+        }
       }
       this.insertAdjacentHTML('afterbegin', html);
       if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
@@ -376,6 +366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (autoShowNew.rnMedium) {
         await rnMediaList.appendToTl(note);
       } else {
+        const deleteIndex = stored.rnMedia.indexOf(stored.rnMedia.find(storedNote => storedNote.renoteId === note.renoteId));
+        if (deleteIndex !== -1) {
+          stored.rnMedia.splice(deleteIndex, 0);
+        }
         stored.rnMedia.push(note);
         // console.log('rnMedia pushed, stored rnMedia count:',stored.rnMedia.length);
         if (stored.rnMedia.length > noteLimit) {
