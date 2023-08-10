@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (autoShowNew.rnMedium) {
         await rnMediaList.appendToTl(note);
       } else {
-        const deleteIndex = stored.rnMedia.indexOf(stored.rnMedia.find(storedNote => storedNote.renoteId === note.renoteId));
+        const deleteIndex = stored.rnMedia.findIndex(storedNote => storedNote.renoteId === note.renoteId);
         if (deleteIndex !== -1) {
           stored.rnMedia.splice(deleteIndex, 0);
         }
