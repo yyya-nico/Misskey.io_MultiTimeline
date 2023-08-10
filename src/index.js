@@ -271,23 +271,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (isNote) {
         const note = noteOrNotes;
         const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
-        html = await makeHTMLFromNoteForMedia(note, target);
-        if (this === rnMediaList) {
+        if (target == 'renote') {
           const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
           alreadyRN && alreadyRN.remove();
         }
+        html = await makeHTMLFromNoteForMedia(note, target);
       } else {
         const notes = noteOrNotes;
+        const latestRenotes = [];
         const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
-        while (notes.length) {
-          const note = notes.shift();
-          html = `${await makeHTMLFromNoteForMedia(note, target)}${html}`;
-          // console.log('note shifted, notes count:', notes.length);
-          if (this === rnMediaList) { // TODO: RN内容に複数重複があったときに最新のリノートを除いて除去したい
-            const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
+        if (target === 'renote') {
+          const renoteIds = new Set(notes.map(note => note.renoteId));
+          renoteIds.forEach(renoteId => {
+            latestRenotes.push(notes.findLast(note => note.renoteId === renoteId));
+            const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${renoteId}"]`);
             alreadyRN && alreadyRN.remove();
-          }
+          });
         }
+        (async notes => {
+          while (notes.length) {
+            const note = notes.shift();
+            // console.log('note shifted, notes count:', notes.length);
+            html = `${await makeHTMLFromNoteForMedia(note, target)}${html}`;
+          }
+        })(target === 'note' && notes || target === 'renote' && latestRenotes);
       }
       this.insertAdjacentHTML('afterbegin', html);
       if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
