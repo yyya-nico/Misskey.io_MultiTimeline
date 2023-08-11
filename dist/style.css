@@ -65,7 +65,7 @@ body {
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 56px calc(50% - 28px) calc(50% - 28px);
+  grid-template-rows: 56px repeat(2, calc(50% - 28px));
   height: 100vh;
   height: 100dvh;
 }
@@ -115,7 +115,7 @@ body {
 }
 .grid .container.media, .grid .container.rn-media {
   padding-top: 56px;
-  padding-bottom: 50vh;
+  padding-bottom: calc(50vh - 28px);
 }
 .grid .container.media {
   grid-column: 1;
