@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
         this.parentElement.scrollTop = 0;
       }
-      const img = this.querySelector('img');
+      const img = this.firstElementChild.querySelector('img');
       if (img && img.src !== '') {
         img.addEventListener('load', () => {
           if (this === mediaList) {
