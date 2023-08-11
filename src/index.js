@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const notes = noteOrNotes;
         while (notes.length) {
           const note = notes.pop();
-          console.log('note poped, notes count:', notes.length);
+          // console.log('note poped, notes count:', notes.length);
           if (target == 'renote') {
             const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
             alreadyRN && alreadyRN.remove();
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await mediaList.appendToTl(note);
       } else {
         stored.media.push(note);
-        console.log('media pushed, stored media count:',stored.media.length);
+        // console.log('media pushed, stored media count:',stored.media.length);
         if (stored.media.length > noteLimit) {
           stored.media = stored.media.slice(-noteLimit);
         }
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           stored.rnMedia.splice(deleteIndex, 1);
         }
         stored.rnMedia.push(note);
-        console.log('rnMedia pushed, stored rnMedia count:',stored.rnMedia.length);
+        // console.log('rnMedia pushed, stored rnMedia count:',stored.rnMedia.length);
         if (stored.rnMedia.length > noteLimit) {
           stored.rnMedia = stored.rnMedia.slice(-noteLimit);
         }
