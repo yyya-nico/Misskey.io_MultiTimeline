@@ -75,14 +75,13 @@ body {
         .notes,
         .renotes {
             .contains-sensitive {
-                display: none;
+                display: none !important;
             }
         }
 
         .media,
         .rn-media {
-            .contains-sensitive * {
-                // Magic Grid 動作不良対策
+            .contains-sensitive * {// Magic Grid 動作不良対策
                 display: none !important;
             }
         }

@@ -71,7 +71,7 @@ body {
 }
 .grid.hide-sensitive .notes .contains-sensitive,
 .grid.hide-sensitive .renotes .contains-sensitive {
-  display: none;
+  display: none !important;
 }
 .grid.hide-sensitive .media .contains-sensitive *,
 .grid.hide-sensitive .rn-media .contains-sensitive * {
