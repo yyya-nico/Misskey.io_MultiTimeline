@@ -70,6 +70,24 @@ body {
     height: 100vh;
     height: 100dvh;
 
+    &.hide-sensitive {
+
+        .notes,
+        .renotes {
+            .contains-sensitive {
+                display: none;
+            }
+        }
+
+        .media,
+        .rn-media {
+            .contains-sensitive * {
+                // Magic Grid 動作不良対策
+                display: none !important;
+            }
+        }
+    }
+
     .h-notes,
     .h-renotes {
         z-index: 1;
@@ -106,7 +124,7 @@ body {
                 margin-top: auto;
             }
 
-            > [id$="-latest"] {
+            >[id$="-latest"] {
                 align-self: baseline;
             }
         }
@@ -404,6 +422,15 @@ body {
         grid-template-columns: repeat(2, 90%);
         overflow-x: auto;
     }
+}
+
+.config {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    height: 56px;
+    padding: 15px 12.5px;
 }
 
 @keyframes flash {

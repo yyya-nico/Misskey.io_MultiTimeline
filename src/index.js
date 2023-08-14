@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const hTimeline = stream.useChannel('localTimeline');
   // const stream = new misskeyStream(currentOrigin, {token: ''});
   // const hTimeline = stream.useChannel('homeTimeline');
+  const grid = document.querySelector('.grid');
   const containers = document.querySelectorAll('.container');
   const noteList = document.getElementById('notes-list');
   const renoteList = document.getElementById('renotes-list');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renotelatestBtn = document.getElementById('renote-latest');
   const mediumlatestBtn = document.getElementById('medium-latest');
   const rnMediumlatestBtn = document.getElementById('rn-medium-latest');
+  const hideSensitive = document.getElementById('hide-sensitive');
   const autoShowNew = {
     note: true,
     renote: true,
@@ -155,6 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  const detectSensitiveFile = note => {
+    return note.files.some(file => file.isSensitive);
+  }
+
   const makeHTMLFromNote = async note => {
     note.isRenote = Boolean(note.renoteId);
     const renote = note.isRenote ? note.renote : null;
@@ -168,6 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       text:      await makeTextHTMLFromNote(note),
       fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '', 
       time:      new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}),
+      containsSensitive: (detectSensitiveFile(note) || renote && detectSensitiveFile(renote)) ? 'contains-sensitive' : '',
       ...(renote && {
         rnName:      renote.user.name ? await simpleMfmToHTML(renote.user.name, renote.host) : renote.user.username,
         plainRnName: renote.user.name ? renote.user.name : renote.user.username,
@@ -177,12 +184,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       })
     };
     const html = !renote ? 
-    `<li data-id="${note.id}">
+    `<li data-id="${note.id}" class="${formatted.containsSensitive}">
       <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="_blank" rel=”noopener”>${formatted.time}</a>
     </li>
     `
     :
-    `<li data-id="${note.id}">
+    `<li data-id="${note.id}" class="${formatted.containsSensitive}">
       <div class="renote-info">
         <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="_blank" rel=”noopener”>${formatted.time}</a>
       </div>
@@ -203,9 +210,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       text:      await makeTextHTMLFromNote(targetNote, renote && renote.host),
       plainText: (note => {return note.cw !== null ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(targetNote),
       fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
+      containsSensitive: detectSensitiveFile(targetNote) || targetNote.cw !== null ? 'contains-sensitive' : ''
     };
     const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
+    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
         <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}">
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
@@ -217,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </li>
     `
     : firstFile.type.includes('audio') ?
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
+    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
         <span class="file-type">音声</span>
         ${formatted.fileCount}
@@ -228,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </li>
     `
     : 
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''}>
+    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
       <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
         <span class="file-type">その他:${firstFile.type}</span>
         ${formatted.fileCount}
@@ -454,6 +462,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     });
+  });
+
+  hideSensitive.addEventListener('change', () => {
+    if (hideSensitive.checked) {
+      grid.classList.add('hide-sensitive');
+    } else {
+      grid.classList.remove('hide-sensitive');
+    }
+    mediaMG.positionItems();
+    rnMediaMG.positionItems();
   });
 
   document.addEventListener('keydown', (event) => {

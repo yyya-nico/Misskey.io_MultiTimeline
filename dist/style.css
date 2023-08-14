@@ -69,6 +69,14 @@ body {
   height: 100vh;
   height: 100dvh;
 }
+.grid.hide-sensitive .notes .contains-sensitive,
+.grid.hide-sensitive .renotes .contains-sensitive {
+  display: none;
+}
+.grid.hide-sensitive .media .contains-sensitive *,
+.grid.hide-sensitive .rn-media .contains-sensitive * {
+  display: none !important;
+}
 .grid .h-notes,
 .grid .h-renotes {
   z-index: 1;
@@ -361,6 +369,15 @@ body {
     grid-template-columns: repeat(2, 90%);
     overflow-x: auto;
   }
+}
+
+.config {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  height: 56px;
+  padding: 15px 12.5px;
 }
 
 @keyframes flash {
