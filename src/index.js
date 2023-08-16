@@ -464,11 +464,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  if (localStorage.getItem('hideSensitive')) {
+    hideSensitive.checked = Boolean(localStorage.getItem('hideSensitive'));
+  }
+  if (hideSensitive.checked) {
+    grid.classList.add('hide-sensitive');
+  }
   hideSensitive.addEventListener('change', () => {
     if (hideSensitive.checked) {
       grid.classList.add('hide-sensitive');
+      localStorage.setItem('hideSensitive', String(hideSensitive.checked));
     } else {
       grid.classList.remove('hide-sensitive');
+      localStorage.removeItem('hideSensitive');
     }
     mediaMG.positionItems();
     rnMediaMG.positionItems();
