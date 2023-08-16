@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           break;
         case 'text':
-          html += node.props.text;
+          html += node.props.text.replace(/\n/g, '<br>');
           break;
         case 'unicodeEmoji':
           html += node.props.emoji;
@@ -147,9 +147,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const makeTextHTMLFromNote = async (note, host) => {
     if (note.cw !== null) {
-      return `[CW]${await simpleMfmToHTML(htmlspecialchars(note.cw), host)} <span class="cwtext">${(await simpleMfmToHTML(htmlspecialchars(note.text), host)).replace(/\n/g, '<br>')}</span>`;
+      return `[CW]${await simpleMfmToHTML(htmlspecialchars(note.cw), host)} <span class="cwtext">${(await simpleMfmToHTML(htmlspecialchars(note.text), host))}</span>`;
     } else if (note.text) {
-      return (await simpleMfmToHTML(htmlspecialchars(note.text), host)).replace(/\n/g, '<br>');
+      return await simpleMfmToHTML(htmlspecialchars(note.text), host);
     } else if (note.renoteId || note.fileIds.length) {
       return '';
     } else {
