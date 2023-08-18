@@ -174,8 +174,17 @@ body {
 
                     &.is-open {
                         white-space: normal;
+                        cursor: pointer;
 
-                        .text {
+                        >.name {
+                            cursor: auto;
+                        }
+
+                        >.text {
+                            &.is-long:hover {
+                                text-decoration: initial;
+                            }
+
                             br {
                                 display: inline;
                             }
@@ -214,6 +223,14 @@ body {
 
                     >.text {
                         margin-left: 10px;
+
+                        &.is-long {
+                            cursor: pointer;
+
+                            &:hover {
+                                text-decoration: underline;
+                            }
+                        }
 
                         .nothing {
                             color: #7f7f7f;

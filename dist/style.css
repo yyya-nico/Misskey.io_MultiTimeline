@@ -154,9 +154,18 @@ body {
 .grid .container #notes-list > li .wrap.is-open,
 .grid .container #renotes-list > li .wrap.is-open {
   white-space: normal;
+  cursor: pointer;
 }
-.grid .container #notes-list > li .wrap.is-open .text br,
-.grid .container #renotes-list > li .wrap.is-open .text br {
+.grid .container #notes-list > li .wrap.is-open > .name,
+.grid .container #renotes-list > li .wrap.is-open > .name {
+  cursor: auto;
+}
+.grid .container #notes-list > li .wrap.is-open > .text.is-long:hover,
+.grid .container #renotes-list > li .wrap.is-open > .text.is-long:hover {
+  text-decoration: initial;
+}
+.grid .container #notes-list > li .wrap.is-open > .text br,
+.grid .container #renotes-list > li .wrap.is-open > .text br {
   display: inline;
 }
 .grid .container #notes-list > li .wrap > .name .custom-emoji,
@@ -195,6 +204,14 @@ body {
 .grid .container #notes-list > li .wrap > .text,
 .grid .container #renotes-list > li .wrap > .text {
   margin-left: 10px;
+}
+.grid .container #notes-list > li .wrap > .text.is-long,
+.grid .container #renotes-list > li .wrap > .text.is-long {
+  cursor: pointer;
+}
+.grid .container #notes-list > li .wrap > .text.is-long:hover,
+.grid .container #renotes-list > li .wrap > .text.is-long:hover {
+  text-decoration: underline;
 }
 .grid .container #notes-list > li .wrap > .text .nothing,
 .grid .container #renotes-list > li .wrap > .text .nothing {

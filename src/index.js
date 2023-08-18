@@ -249,6 +249,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     return html;
   };
 
+  const overflowJudgment = () => {
+    const textWraps = document.querySelectorAll('li .wrap');
+    textWraps.forEach(wrap => {
+      const text = wrap.querySelector('.text');
+      if (wrap.classList.contains('is-open') || wrap.offsetWidth < wrap.scrollWidth || text.querySelector('br')) {
+        text.classList.add('is-long');
+      } else {
+        text.classList.remove('is-long');
+      }
+    });
+  }
+
+  window.addEventListener('resize', overflowJudgment);
+
+  const textToggleHandler = e => {
+    if (e.target.closest('.is-long') || e.target.closest('.wrap') && e.target.querySelector('.is-long')) {
+      e.target.closest('.wrap').classList.toggle('is-open');
+    }
+  }
+
+  noteList.addEventListener('click', textToggleHandler);
+  renoteList.addEventListener('click', textToggleHandler);
+
   Node.prototype.appendToTl = async function(noteOrNotes) {
     if (this !== noteList && this !== renoteList && this !== mediaList && this !== rnMediaList) {
       return false;
@@ -320,6 +343,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.lastElementChild.remove();
       }
     }
+    overflowJudgment();
   }
 
   stream.on('_connected_', async () => {
@@ -386,15 +410,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   });
-
-  const textToggleHandler = e => {
-    if (e.target.closest('.wrap')) {
-      e.target.closest('.wrap').classList.toggle('is-open');
-    }
-  }
-
-  noteList.addEventListener('click', textToggleHandler);
-  renoteList.addEventListener('click', textToggleHandler);
 
   const latestBtnHandler = async e => {
     const latestBtn = e.target;
