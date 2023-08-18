@@ -172,19 +172,30 @@ body {
                     word-break: break-all;
                     text-overflow: ellipsis;
 
-                    &.is-open {
-                        white-space: normal;
+                    &:has(.text.is-long) {
                         cursor: pointer;
+
+                        &:hover>.text.is-long {
+                            text-decoration: underline;
+                        }
 
                         >.name {
                             cursor: auto;
+
+                            &:hover~.text.is-long {
+                                text-decoration: initial;
+                            }
+                        }
+                    }
+
+                    &.is-open {
+                        white-space: normal;
+
+                        &:hover>.text.is-long {
+                            text-decoration: initial;
                         }
 
                         >.text {
-                            &.is-long:hover {
-                                text-decoration: initial;
-                            }
-
                             br {
                                 display: inline;
                             }
@@ -223,14 +234,6 @@ body {
 
                     >.text {
                         margin-left: 10px;
-
-                        &.is-long {
-                            cursor: pointer;
-
-                            &:hover {
-                                text-decoration: underline;
-                            }
-                        }
 
                         .nothing {
                             color: #7f7f7f;
