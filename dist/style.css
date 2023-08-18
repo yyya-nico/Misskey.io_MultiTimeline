@@ -167,16 +167,16 @@ body {
 .grid .container #renotes-list > li .wrap:has(.text.is-long) > .name:hover ~ .text.is-long {
   text-decoration: initial;
 }
-.grid .container #notes-list > li .wrap.is-open,
-.grid .container #renotes-list > li .wrap.is-open {
+.grid .container #notes-list > li .wrap:has(.text.is-long).is-open,
+.grid .container #renotes-list > li .wrap:has(.text.is-long).is-open {
   white-space: normal;
 }
-.grid .container #notes-list > li .wrap.is-open:hover > .text.is-long,
-.grid .container #renotes-list > li .wrap.is-open:hover > .text.is-long {
+.grid .container #notes-list > li .wrap:has(.text.is-long).is-open:hover > .text.is-long,
+.grid .container #renotes-list > li .wrap:has(.text.is-long).is-open:hover > .text.is-long {
   text-decoration: initial;
 }
-.grid .container #notes-list > li .wrap.is-open > .text br,
-.grid .container #renotes-list > li .wrap.is-open > .text br {
+.grid .container #notes-list > li .wrap:has(.text.is-long).is-open > .text br,
+.grid .container #renotes-list > li .wrap:has(.text.is-long).is-open > .text br {
   display: inline;
 }
 .grid .container #notes-list > li .wrap > .name .custom-emoji,

@@ -186,18 +186,18 @@ body {
                                 text-decoration: initial;
                             }
                         }
-                    }
 
-                    &.is-open {
-                        white-space: normal;
-
-                        &:hover>.text.is-long {
-                            text-decoration: initial;
-                        }
-
-                        >.text {
-                            br {
-                                display: inline;
+                        &.is-open {
+                            white-space: normal;
+    
+                            &:hover>.text.is-long {
+                                text-decoration: initial;
+                            }
+    
+                            >.text {
+                                br {
+                                    display: inline;
+                                }
                             }
                         }
                     }
