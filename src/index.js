@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renotelatestBtn = document.getElementById('renote-latest');
   const mediumlatestBtn = document.getElementById('medium-latest');
   const rnMediumlatestBtn = document.getElementById('rn-medium-latest');
-  const hideSensitive = document.getElementById('hide-sensitive');
+  const selectDisplay = document.getElementById('select-display');
+  const sdLabel = document.querySelector('[for="select-display"]');
   const autoShowNew = {
     note: true,
     renote: true,
@@ -45,6 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     gutter: 20,
     animate: true
   });
+  const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
+  const sdLabelStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
   let wakeLock = null;
   mediaMG.listen();
   rnMediaMG.listen();
@@ -479,22 +482,72 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  if (localStorage.getItem('hideSensitive')) {
-    hideSensitive.checked = Boolean(localStorage.getItem('hideSensitive'));
+  const confirmSensitive = () => {
+    const confirmSensitive = document.querySelector('.confirm-sensitive');
+    const buttons = document.querySelector('.buttons');
+    let runResolve;
+
+    confirmSensitive.classList.add('show');
+    buttons.addEventListener('click', e => {
+      if (e.target.tagName.toLowerCase() !== 'button') {
+        return;
+      }
+      if (e.target.name === 'yes') {
+        runResolve(true);
+      } else if (e.target.name === 'no') {
+        runResolve(false);
+      }
+      confirmSensitive.classList.remove('show');
+    });
+    return new Promise(resolve => {
+      runResolve = resolve;
+    });
   }
-  if (hideSensitive.checked) {
-    grid.classList.add('hide-sensitive');
-  }
-  hideSensitive.addEventListener('change', () => {
-    if (hideSensitive.checked) {
-      grid.classList.add('hide-sensitive');
-      localStorage.setItem('hideSensitive', String(hideSensitive.checked));
+
+  let asked = false;
+  if (localStorage.getItem('tlDisplay')) {
+    const tlDisplay = localStorage.getItem('tlDisplay');
+    if (tlDisplay === '2'/* sensitive only */) {
+      const passed = await confirmSensitive();
+      selectDisplay.value = passed ? tlDisplay : tlDisplay - 1;
+      if (passed) {
+        asked = true;        
+      }
     } else {
-      grid.classList.remove('hide-sensitive');
-      localStorage.removeItem('hideSensitive');
+      selectDisplay.value = tlDisplay;
     }
-    mediaMG.positionItems();
-    rnMediaMG.positionItems();
+    sdLabel.textContent = sdLabelStrings[selectDisplay.value];
+  }
+  let sdIndexCache = selectDisplay.value;
+  grid.classList.add(tlDisplayClassNames[sdIndexCache]);
+  selectDisplay.addEventListener('pointerdown', () => {
+    sdLabel.textContent = sdLabelStrings[sdIndexCache];
+  }, {once: true});
+  selectDisplay.addEventListener('input', async () => {
+    if (selectDisplay.value === '2'/* sensitive only */ && !asked) {
+      const passed = await confirmSensitive();
+      if (!passed) {
+        selectDisplay.value = sdIndexCache;
+        return;
+      } else {
+        asked = true;
+      }
+    }
+    if (selectDisplay.value !== '0') {
+      localStorage.setItem('tlDisplay', selectDisplay.value);
+    } else {
+      localStorage.removeItem('tlDisplay');
+    }
+    grid.classList.add(tlDisplayClassNames[selectDisplay.value]);
+    sdLabel.textContent = sdLabelStrings[selectDisplay.value];
+    grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
+    sdIndexCache = selectDisplay.value;
+    if (mediaList.firstElementChild) {
+      mediaMG.positionItems();
+    }
+    if (rnMediaList.firstElementChild) {
+      rnMediaMG.positionItems();
+    }
   });
 
   document.addEventListener('keydown', (event) => {

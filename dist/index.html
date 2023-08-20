@@ -44,7 +44,20 @@
         </div>
     </div>
     <div class="config">
-        <label for="hide-sensitive">NSFWを非表示</label><input type="checkbox" id="hide-sensitive">
+        <label for="select-display">表示レベル</label><input type="range" id="select-display" value="0" min="0" max="2">
+    </div>
+    <div class="confirm-sensitive">
+        <div class="wrap">
+            <p>
+                <span style="color: yellow;">⚠️</span><br>
+                閲覧に注意が必要です。<br>
+                続行しますか？
+            </p>
+            <div class="buttons">
+                <button name="yes">はい</button>
+                <button name="no">いいえ</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>
