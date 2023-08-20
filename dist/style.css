@@ -413,6 +413,7 @@ body {
   z-index: 2;
   height: 56px;
   padding: 15px 12.5px;
+  background-color: rgba(0, 0, 0, 0.4980392157);
 }
 .config #select-display {
   width: 80px;
@@ -465,10 +466,10 @@ body {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  width: 50%;
-  height: 50%;
-  min-width: min(300px, 100dvw);
-  min-height: min(300px, 100dvh);
+  width: 300px;
+  height: 300px;
+  max-width: 100dvw;
+  max-height: 100dvh;
 }
 .confirm-sensitive.show .wrap p {
   font-size: 1.4em;
