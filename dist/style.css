@@ -70,19 +70,17 @@ body {
   height: 100dvh;
 }
 .grid.hide-sensitive #notes-list > .contains-sensitive,
-.grid.hide-sensitive #renotes-list > .contains-sensitive {
-  display: none;
-}
-.grid.hide-sensitive #media-list > .contains-sensitive *,
-.grid.hide-sensitive #rn-media-list > .contains-sensitive * {
+.grid.hide-sensitive #renotes-list > .contains-sensitive,
+.grid.hide-sensitive #media-list > .contains-sensitive,
+.grid.hide-sensitive #rn-media-list > .contains-sensitive {
   display: none;
 }
 .grid.sensitive-only #notes-list > li:not(.contains-sensitive),
 .grid.sensitive-only #renotes-list > li:not(.contains-sensitive) {
   display: none;
 }
-.grid.sensitive-only #media-list > li:not(.contains-sensitive) *,
-.grid.sensitive-only #rn-media-list > li:not(.contains-sensitive) * {
+.grid.sensitive-only #media-list > li:not(.contains-sensitive),
+.grid.sensitive-only #rn-media-list > li:not(.contains-sensitive) {
   display: none;
 }
 .grid.sensitive-only #media-list > li > a > img.is-sensitive,
@@ -269,26 +267,27 @@ body {
 }
 .grid .container #media-list,
 .grid .container #rn-media-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 10px;
   list-style: none;
 }
 .grid .container #media-list > li,
 .grid .container #rn-media-list > li {
-  width: calc(33% - 20px);
-  height: -moz-fit-content;
-  height: fit-content;
   overflow: hidden;
   border-radius: 4px;
   background-color: #333333;
+  transition: all 0.5s ease-out;
 }
 .grid .container #media-list > li > a,
 .grid .container #rn-media-list > li > a {
   display: block;
   position: relative;
   width: 100%;
-  height: -moz-fit-content;
-  height: fit-content;
   color: inherit;
   text-decoration: none;
+  aspect-ratio: 1;
 }
 .grid .container #media-list > li > a:has(.more-file-count)::after,
 .grid .container #rn-media-list > li > a:has(.more-file-count)::after {
@@ -306,7 +305,9 @@ body {
 .grid .container #rn-media-list > li > a > img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 .grid .container #media-list > li > a > img.is-sensitive,
 .grid .container #rn-media-list > li > a > img.is-sensitive {

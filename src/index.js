@@ -1,6 +1,5 @@
 import { Stream as misskeyStream } from 'misskey-js';
 import { parseSimple as mfmParseSimple } from 'mfm-js';
-import MagicGrid from 'magic-grid';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const currentOrigin = 'https://misskey.io';
@@ -34,23 +33,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   const emojiShortcodeToUrlDic = {};
   const noteLimit = 150;
-  const mediaMG = new MagicGrid({
-    container: '#media-list',
-    items: 1,
-    gutter: 20,
-    animate: true
-  });
-  const rnMediaMG = new MagicGrid({
-    container: '#rn-media-list',
-    items: 1,
-    gutter: 20,
-    animate: true
-  });
   const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
   const sdLabelStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
   let wakeLock = null;
-  mediaMG.listen();
-  rnMediaMG.listen();
 
   const scrollToBottom = node => {
     node.scrollTop = node.scrollHeight;
@@ -327,21 +312,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         this.parentElement.scrollTop = 0;
       }
       const img = this.firstElementChild.querySelector('img');
-      if (img && img.src !== '') {
-        img.addEventListener('load', () => {
-          if (this === mediaList) {
-            mediaMG.positionItems();
-          } else if (this === rnMediaList) {
-            rnMediaMG.positionItems();
-          }
-        });
-      } else {
-        if (this === mediaList) {
-          mediaMG.positionItems();
-        } else if (this === rnMediaList) {
-          rnMediaMG.positionItems();
-        }
-      }
       while (this.querySelectorAll('li').length > noteLimit) {
         this.lastElementChild.remove();
       }
@@ -547,12 +517,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (autoShowNew.renote) {
       scrollToBottom(renoteList.parentElement);
-    }
-    if (mediaList.firstElementChild) {
-      mediaMG.positionItems();
-    }
-    if (rnMediaList.firstElementChild) {
-      rnMediaMG.positionItems();
     }
   });
 
