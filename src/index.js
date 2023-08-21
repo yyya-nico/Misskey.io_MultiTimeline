@@ -542,6 +542,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     sdLabel.textContent = sdLabelStrings[selectDisplay.value];
     grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
     sdIndexCache = selectDisplay.value;
+    if (autoShowNew.note) {
+      scrollToBottom(noteList.parentElement);
+    }
+    if (autoShowNew.renote) {
+      scrollToBottom(renoteList.parentElement);
+    }
     if (mediaList.firstElementChild) {
       mediaMG.positionItems();
     }
