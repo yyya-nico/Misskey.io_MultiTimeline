@@ -12,6 +12,11 @@
 }
 
 html,
+body {
+  overscroll-behavior: contain;
+}
+
+html,
 html * {
   scrollbar-color: var(--scrollbarHandle) transparent;
   scrollbar-width: thin;
@@ -41,11 +46,6 @@ html *::-webkit-scrollbar-thumb:hover {
 html::-webkit-scrollbar-thumb:active,
 html *::-webkit-scrollbar-thumb:active {
   background: var(--accent);
-}
-
-html,
-body {
-  overscroll-behavior: none;
 }
 
 body {
@@ -116,6 +116,7 @@ body {
 }
 .grid .container {
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .grid .container.notes, .grid .container.renotes {
   display: flex;
