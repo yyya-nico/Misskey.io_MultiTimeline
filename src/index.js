@@ -188,16 +188,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const html = !renote ? 
     `<li data-id="${note.id}" class="${formatted.containsSensitive}">
-      <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="_blank" rel=”noopener”>${formatted.time}</a>
+      <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
     </li>
     `
     :
     `<li data-id="${note.id}" class="${formatted.containsSensitive}">
       <div class="renote-info">
-        <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="_blank" rel=”noopener”>${formatted.time}</a>
+        <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
       </div>
       <div class="renoted-note">
-        <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${currentOrigin}/notes/${renote.id}" class="time" target="_blank" rel=”noopener”>${formatted.rnTime}</a>
+        <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${currentOrigin}/notes/${renote.id}" class="time" target="misskey" rel=”noopener”>${formatted.rnTime}</a>
       </div>
     </li>
     `;
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
+      <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
         <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}">
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
         ${formatted.fileCount}
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `
     : firstFile.type.includes('audio') ?
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
+      <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
         <span class="file-type">音声</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     `
     : 
     `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${currentOrigin}/notes/${note.id}" class="link" target="_blank" rel=”noopener”>
+      <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
         <span class="file-type">その他:${firstFile.type}</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
