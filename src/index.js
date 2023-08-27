@@ -274,7 +274,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   window.addEventListener('resize', overflowJudgment);
 
+  let selecting = false;
+  document.addEventListener('selectstart', () => {
+    document.addEventListener('pointerup', function() {
+      selecting = !window.getSelection().isCollapsed;
+    }, {once: true});
+  });
+
   const textToggleHandler = e => {
+    if (selecting) {
+      selecting = false;
+      return;
+    }
     if (e.target.closest('.is-long') || e.target.closest('.wrap') && e.target.querySelector('.is-long')) {
       e.target.closest('.wrap').classList.toggle('is-open');
     }
@@ -284,6 +295,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   renoteList.addEventListener('click', textToggleHandler);
 
   const mediaTextToggleHandler = e => {
+    if (selecting) {
+      selecting = false;
+      return;
+    }
     if (e.target.classList.contains('is-long')) {
       e.target.classList.toggle('is-open');
     }
