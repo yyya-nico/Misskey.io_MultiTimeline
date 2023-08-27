@@ -414,6 +414,26 @@ body {
                     word-break: break-all;
                     text-overflow: ellipsis;
 
+                    &.is-long {
+                        cursor: pointer;
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
+
+                        &.is-open {
+                            white-space: normal;
+
+                            &:hover {
+                                text-decoration: initial;
+                            }
+                            
+                            br {
+                                display: inline;
+                            }
+                        }
+                    }
+
                     br {
                         display: none;
                     }

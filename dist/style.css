@@ -354,6 +354,26 @@ body {
   word-break: break-all;
   text-overflow: ellipsis;
 }
+.grid .container #media-list > li > .text.is-long,
+.grid .container #rn-media-list > li > .text.is-long {
+  cursor: pointer;
+}
+.grid .container #media-list > li > .text.is-long:hover,
+.grid .container #rn-media-list > li > .text.is-long:hover {
+  text-decoration: underline;
+}
+.grid .container #media-list > li > .text.is-long.is-open,
+.grid .container #rn-media-list > li > .text.is-long.is-open {
+  white-space: normal;
+}
+.grid .container #media-list > li > .text.is-long.is-open:hover,
+.grid .container #rn-media-list > li > .text.is-long.is-open:hover {
+  text-decoration: initial;
+}
+.grid .container #media-list > li > .text.is-long.is-open br,
+.grid .container #rn-media-list > li > .text.is-long.is-open br {
+  display: inline;
+}
 .grid .container #media-list > li > .text br,
 .grid .container #rn-media-list > li > .text br {
   display: none;

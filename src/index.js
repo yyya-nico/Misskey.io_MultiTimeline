@@ -212,7 +212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstFile = targetNote.files[0];
     const formatted = {
       text:      await makeTextHTMLFromNote(targetNote, renote && renote.host),
-      plainText: (note => {return note.cw !== null ? note.cw : note.text ? note.text.replace(/\n/g, '') : ''})(targetNote),
       fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
       containsSensitive: detectSensitiveFile(targetNote) || targetNote.cw !== null ? 'contains-sensitive' : ''
     };
@@ -223,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
         ${formatted.fileCount}
       </a>${formatted.text &&`
-      <div class="text" title="${formatted.plainText}">
+      <div class="text">
         ${formatted.text}
       </div>`}
     </li>
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span class="file-type">音声</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
-      <div class="text" title="${formatted.plainText}">
+      <div class="text">
         ${formatted.text}
       </div>`}
     </li>
@@ -245,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span class="file-type">その他:${firstFile.type}</span>
         ${formatted.fileCount}
       </a>${formatted.text &&`
-      <div class="text" title="${formatted.plainText}">
+      <div class="text">
         ${formatted.text}
       </div>`}
     </li>
@@ -263,6 +262,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         text.classList.remove('is-long');
       }
     });
+    const texts = document.querySelectorAll('li > div.text');
+    texts.forEach(text => {
+      if (text.classList.contains('is-open') || text.offsetWidth < text.scrollWidth || text.querySelector('br')) {
+        text.classList.add('is-long');
+      } else {
+        text.classList.remove('is-long');
+      }
+    });
   }
 
   window.addEventListener('resize', overflowJudgment);
@@ -275,6 +282,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   noteList.addEventListener('click', textToggleHandler);
   renoteList.addEventListener('click', textToggleHandler);
+
+  const mediaTextToggleHandler = e => {
+    if (e.target.classList.contains('is-long')) {
+      e.target.classList.toggle('is-open');
+    }
+    if (e.target.closest('#media-list')) {
+      mediaMG.positionItems();
+    } else if (e.target.closest('#rn-media-list')) {
+      rnMediaMG.positionItems();
+    }
+  }
+
+  mediaList.addEventListener('click', mediaTextToggleHandler);
+  rnMediaList.addEventListener('click', mediaTextToggleHandler);
 
   Node.prototype.appendToTl = async function(noteOrNotes) {
     if (this !== noteList && this !== renoteList && this !== mediaList && this !== rnMediaList) {
