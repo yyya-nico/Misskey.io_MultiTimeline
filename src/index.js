@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return note.files.some(file => file.isSensitive);
   }
 
-  const makeHTMLFromNote = async note => {
+  const makeHTMLFromNote = async (note, target) => {
     note.isRenote = Boolean(note.renoteId);
     const renote = note.isRenote ? note.renote : null;
     renote && (renote.host = renote.user.host);
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '', 
       time:      new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}),
       containsSensitive: (detectSensitiveFile(note) || renote && detectSensitiveFile(renote)) ? 'contains-sensitive' : '',
-      ...(renote && {
+      ...(target === 'renote' && {
         rnName:      renote.user.name ? await simpleMfmToHTML(renote.user.name, renote.host) : renote.user.username,
         plainRnName: renote.user.name ? renote.user.name : renote.user.username,
         rnText:      await makeTextHTMLFromNote(renote, renote.host),
@@ -186,12 +186,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         rnTime: fromNow(new Date(renote.createdAt))
       })
     };
-    const html = !renote ? 
+    const html = target === 'note' ? 
     `<li data-id="${note.id}" class="${formatted.containsSensitive}">
       <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
     </li>
     `
-    :
+    : target === 'renote' ?
     `<li data-id="${note.id}" class="${formatted.containsSensitive}">
       <div class="renote-info">
         <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
@@ -200,7 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${currentOrigin}/notes/${renote.id}" class="time" target="misskey" rel=”noopener”>${formatted.rnTime}</a>
       </div>
     </li>
-    `;
+    `
+    : false;
     return html;
   };
 
@@ -283,13 +284,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isNote = !Array.isArray(noteOrNotes);
     let html = '';
     if (this === noteList || this === renoteList ) {
+      const target = this === noteList && 'note' || this === renoteList && 'renote';
       if (isNote) {
         const note = noteOrNotes;
-        html = await makeHTMLFromNote(note);
+        html = await makeHTMLFromNote(note, target);
       } else {
         const notes = noteOrNotes;
         while (notes.length) {
-          html += await makeHTMLFromNote(notes.shift());
+          html += await makeHTMLFromNote(notes.shift(), target);
           // console.log('note shifted, notes count:', notes.length);
         }
       }
@@ -371,21 +373,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   hTimeline.on('note', async note => {
     // console.log(note);
     const isRenote = Boolean(note.renoteId);
-    const kind = !isRenote ? 'note' : 'renote';
-    if (autoShowNew[kind]) {
-      if (!isRenote) {
+    const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
+    if (isNoteOrQuote) {
+      if (autoShowNew.note) {
         await noteList.appendToTl(note);//RN以外
-      }else {
-        await renoteList.appendToTl(note);//RN
-      }
-    } else {
-      stored[`${kind}s`].push(note);
-      // console.log(kind + ' pushed, stored ' + kind +'s count:',stored[`${kind}s`].length);
-      if (stored[`${kind}s`].length > noteLimit) {
-        stored[`${kind}s`] = stored[`${kind}s`].slice(-noteLimit);
+      } else {
+        stored.notes.push(note);//RN以外
+        // console.log('note pushed, stored notes count:',stored.notes.length);
+        if (stored.notes.length > noteLimit) {
+          stored.notes = stored.notes.slice(-noteLimit);
+        }
       }
     }
-    // const mediumKind = !isRenote ? ['medium', 'media'] : ['rnMedium', 'rnMedia'];
+    if (isRenote) {
+      if (autoShowNew.renote) {
+        await renoteList.appendToTl(note);//RN
+      } else {
+        stored.renotes.push(note);//RN
+        // console.log('renote pushed, stored renotes count:',stored.renotes.length);
+        if (stored.renotes.length > noteLimit) {
+          stored.renotes = stored.renotes.slice(-noteLimit);
+        }
+      }
+    }
     if (note.fileIds.length) {
       if (autoShowNew.medium) {
         await mediaList.appendToTl(note);
