@@ -116,7 +116,6 @@ body {
 }
 .grid .container {
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 .grid .container.notes, .grid .container.renotes {
   display: flex;

@@ -144,7 +144,6 @@ body {
 
     .container {
         overflow-y: auto;
-        overscroll-behavior: contain;
 
         &.notes,
         &.renotes {
