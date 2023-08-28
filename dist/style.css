@@ -84,8 +84,8 @@ body {
 .grid.sensitive-only #renotes-list > li:not(.contains-sensitive) {
   display: none;
 }
-.grid.sensitive-only #media-list > li:not(.contains-sensitive) *,
-.grid.sensitive-only #rn-media-list > li:not(.contains-sensitive) * {
+.grid.sensitive-only #media-list > li:not(.contains-sensitive),
+.grid.sensitive-only #rn-media-list > li:not(.contains-sensitive) {
   display: none;
 }
 .grid.sensitive-only #media-list > li > a > img.is-sensitive,

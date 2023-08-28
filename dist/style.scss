@@ -99,7 +99,7 @@ body {
         #media-list,
         #rn-media-list {
             >li {
-                &:not(.contains-sensitive) * {// Magic Grid 動作不良対策
+                &:not(.contains-sensitive) {
                     display: none;
                 }
 
