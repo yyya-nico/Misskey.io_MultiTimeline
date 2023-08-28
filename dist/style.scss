@@ -90,8 +90,10 @@ body {
     &.sensitive-only {
 
         #notes-list,
-        #renotes-list {
-            >li:not(.contains-sensitive) {
+        #renotes-list,
+        #media-list,
+        #rn-media-list {
+            >:not(.contains-sensitive) {
                 display: none;
             }
         }
@@ -99,10 +101,6 @@ body {
         #media-list,
         #rn-media-list {
             >li {
-                &:not(.contains-sensitive) {
-                    display: none;
-                }
-
                 >a {
                     >img {
                         &.is-sensitive {
