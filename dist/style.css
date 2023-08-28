@@ -75,11 +75,9 @@ body {
   height: 100dvh;
 }
 .grid.hide-sensitive #notes-list > .contains-sensitive,
-.grid.hide-sensitive #renotes-list > .contains-sensitive {
-  display: none;
-}
-.grid.hide-sensitive #media-list > .contains-sensitive *,
-.grid.hide-sensitive #rn-media-list > .contains-sensitive * {
+.grid.hide-sensitive #renotes-list > .contains-sensitive,
+.grid.hide-sensitive #media-list > .contains-sensitive,
+.grid.hide-sensitive #rn-media-list > .contains-sensitive {
   display: none;
 }
 .grid.sensitive-only #notes-list > li:not(.contains-sensitive),

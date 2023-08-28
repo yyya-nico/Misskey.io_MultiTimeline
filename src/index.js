@@ -364,24 +364,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
         this.parentElement.scrollTop = 0;
       }
-      const img = this.firstElementChild.querySelector('img');
-      if (img && img.src !== '') {
-        img.addEventListener('load', () => {
-          if (this === mediaList) {
-            mediaMG.positionItems();
-          } else if (this === rnMediaList) {
-            rnMediaMG.positionItems();
-          }
-        });
-      } else {
+      while (this.querySelectorAll('li').length > noteLimit) {
+        this.lastElementChild.remove();
+      }
+      const notesLength = !isNote && noteOrNotes.length || 1;
+      const displayedElems = [...this.children]
+        .slice(0, notesLength)
+        .filter(elem => getComputedStyle(elem).display !== 'none');
+      let foundImg = false;
+      displayedElems.forEach(elem => {
+        const img = elem.querySelector('img');
+        foundImg = img && true;
+        if (img && img.src !== '') {
+          img.addEventListener('load', () => {
+            if (this === mediaList) {
+              mediaMG.positionItems();
+            } else if (this === rnMediaList) {
+              rnMediaMG.positionItems();
+            }
+          });
+        }
+      });
+      if (!foundImg) {
         if (this === mediaList) {
           mediaMG.positionItems();
         } else if (this === rnMediaList) {
           rnMediaMG.positionItems();
         }
-      }
-      while (this.querySelectorAll('li').length > noteLimit) {
-        this.lastElementChild.remove();
       }
     }
     overflowJudgment();

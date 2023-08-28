@@ -78,15 +78,10 @@ body {
     &.hide-sensitive {
 
         #notes-list,
-        #renotes-list {
-            >.contains-sensitive {
-                display: none;
-            }
-        }
-
+        #renotes-list,
         #media-list,
-        #rn-media-list {
-            >.contains-sensitive * {// Magic Grid 動作不良対策
+        #rn-media-list  {
+            >.contains-sensitive {
                 display: none;
             }
         }
