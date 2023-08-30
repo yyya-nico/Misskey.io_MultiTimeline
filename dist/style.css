@@ -58,6 +58,57 @@ body {
   scroll-behavior: smooth;
 }
 
+input[type=range] {
+  height: 2px;
+  background-color: #e5e5e5;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  -webkit-appearance: none;
+          appearance: none;
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  background-color: #ffffff;
+  border-radius: 50%;
+  -moz-appearance: none;
+       appearance: none;
+  cursor: pointer;
+}
+
+input[type=text] {
+  padding: 8px 10px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  color: lightgray;
+  background: #1f1f1f;
+}
+input[type=text]::-moz-placeholder {
+  color: #7f7f7f;
+}
+input[type=text]::placeholder {
+  color: #7f7f7f;
+}
+
+button {
+  padding: 5px 13px;
+  border: 0;
+  border-radius: 5px;
+  background-color: #333333;
+  color: lightgray;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
 .grid .container #renotes-list > li > .renote-info,
 .grid .container #renotes-list > li > .renoted-note, .grid .container #notes-list > li {
   display: flex;
@@ -424,44 +475,111 @@ body {
   }
 }
 
-.config {
-  display: flex;
-  align-items: center;
-  gap: 12.5px;
+.menu {
   position: fixed;
   top: 0;
   right: 0;
   z-index: 2;
+  width: 54px;
   height: 56px;
-  padding: 15px 12.5px;
   background-color: rgba(0, 0, 0, 0.4980392157);
 }
-.config #select-display {
-  width: 80px;
-  height: 2px;
-  background-color: #e5e5e5;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-}
-.config #select-display::-webkit-slider-thumb {
-  width: 12px;
-  height: 12px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  -webkit-appearance: none;
-          appearance: none;
-  cursor: pointer;
-}
-.config #select-display::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+.menu #menu-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 15px 10px;
   border: 0;
-  background-color: #ffffff;
-  border-radius: 50%;
-  -moz-appearance: none;
-       appearance: none;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
+}
+.menu #menu-btn span {
+  display: block;
+  transform-origin: left center;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background-color: #efefef;
+  transition: ease 0.4s;
+}
+
+.config {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  top: 56px;
+  right: 0;
+  z-index: 2;
+  width: 100%;
+  max-width: 300px;
+  height: -moz-fit-content;
+  height: fit-content;
+  max-height: 100%;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.4980392157);
+  transition: ease 0.4s;
+}
+.config.customized-origin .reset-origin {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}
+.config .select-display {
+  display: flex;
+  align-items: center;
+  gap: 12.5px;
+  width: 100%;
+}
+.config .select-display label {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 80px);
+}
+.config .select-display #select-display {
+  width: 80px;
+}
+.config .custom-origin {
+  display: flex;
+  flex-direction: column;
+  gap: 12.5px;
+}
+.config .custom-origin .field-wrap {
+  display: flex;
+}
+.config .custom-origin .field-wrap #custom-origin {
+  width: calc(100% - 65px);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.config .custom-origin .field-wrap #set-origin {
+  width: 65px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.config .reset-origin {
+  display: none;
+}
+
+body.show-config .menu #menu-btn span:nth-child(1) {
+  transform: translateX(5.5px) rotate(45deg);
+}
+body.show-config .menu #menu-btn span:nth-child(2) {
+  opacity: 0;
+}
+body.show-config .menu #menu-btn span:nth-child(3) {
+  transform: translateX(5.5px) rotate(-45deg);
+}
+body.show-config .config {
+  visibility: visible;
+  opacity: 1;
 }
 
 .confirm-sensitive {
@@ -500,15 +618,6 @@ body {
 .confirm-sensitive.show .wrap .buttons {
   display: flex;
   gap: 14px;
-}
-.confirm-sensitive.show .wrap .buttons button {
-  padding: 5px 13px;
-  border: 0;
-  border-radius: 5px;
-  background-color: #333333;
-  color: lightgray;
-  font-size: 1.2em;
-  cursor: pointer;
 }
 .confirm-sensitive.show .wrap .buttons button[name=yes] {
   background-color: gray;

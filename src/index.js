@@ -3,11 +3,6 @@ import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const currentOrigin = 'https://misskey.io';
-  const stream = new misskeyStream(currentOrigin);
-  const hTimeline = stream.useChannel('localTimeline');
-  // const stream = new misskeyStream(currentOrigin, {token: ''});
-  // const hTimeline = stream.useChannel('homeTimeline');
   const grid = document.querySelector('.grid');
   const containers = document.querySelectorAll('.container');
   const noteList = document.getElementById('notes-list');
@@ -18,8 +13,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renotelatestBtn = document.getElementById('renote-latest');
   const mediumlatestBtn = document.getElementById('medium-latest');
   const rnMediumlatestBtn = document.getElementById('rn-medium-latest');
+  const menuBtn = document.getElementById('menu-btn');
+  const configFrame = document.querySelector('.config');
   const selectDisplay = document.getElementById('select-display');
-  const sdLabel = document.querySelector('[for="select-display"]');
+  const sdValue = document.getElementById('select-display-value');
+  const customOriginForm = document.forms['custom-origin'];
+  const customOrigin = document.getElementById('custom-origin');
+  const resetOriginBtn = document.getElementById('reset-origin');
+  const ioOrigin = 'https://misskey.io';
+  let currentOrigin;
+  if (localStorage.getItem('tlOrigin')) {
+    currentOrigin = localStorage.getItem('tlOrigin');
+    document.title = `${currentOrigin.replace('https://', '')} マルチタイムライン`
+    customOrigin.value = currentOrigin.replace('https://', '');
+    configFrame.classList.add('customized-origin');
+  } else {
+    currentOrigin = ioOrigin;
+  }
+  const stream = new misskeyStream(currentOrigin);
+  const hTimeline = stream.useChannel('localTimeline');
+  // const stream = new misskeyStream(currentOrigin, {token: ''});
+  // const hTimeline = stream.useChannel('homeTimeline');
   const autoShowNew = {
     note: true,
     renote: true,
@@ -47,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     animate: true
   });
   const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
-  const sdLabelStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
+  const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
   let wakeLock = null;
   mediaMG.listen();
   rnMediaMG.listen();
@@ -539,20 +553,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const confirmSensitive = () => {
     const confirmSensitive = document.querySelector('.confirm-sensitive');
-    const buttons = document.querySelector('.buttons');
+    const buttons = document.getElementsByName('confirm-sensitive');
     let runResolve;
 
     confirmSensitive.classList.add('show');
-    buttons.addEventListener('click', e => {
-      if (e.target.tagName.toLowerCase() !== 'button') {
-        return;
-      }
-      if (e.target.name === 'yes') {
-        runResolve(true);
-      } else if (e.target.name === 'no') {
-        runResolve(false);
-      }
-      confirmSensitive.classList.remove('show');
+    [...buttons].forEach(button => {
+      button.addEventListener('click', e => {
+        if (e.target.value === 'yes') {
+          runResolve(true);
+        } else if (e.target.value === 'no') {
+          runResolve(false);
+        }
+        confirmSensitive.classList.remove('show');
+      });
     });
     return new Promise(resolve => {
       runResolve = resolve;
@@ -571,12 +584,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       selectDisplay.value = tlDisplay;
     }
-    sdLabel.textContent = sdLabelStrings[selectDisplay.value];
+    sdValue.textContent = sdValueStrings[selectDisplay.value];
   }
   let sdIndexCache = selectDisplay.value;
   grid.classList.add(tlDisplayClassNames[sdIndexCache]);
   selectDisplay.addEventListener('pointerdown', () => {
-    sdLabel.textContent = sdLabelStrings[sdIndexCache];
+    sdValue.textContent = sdValueStrings[sdIndexCache];
   }, {once: true});
   selectDisplay.addEventListener('input', async () => {
     if (selectDisplay.value === '2'/* sensitive only */ && !asked) {
@@ -594,7 +607,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem('tlDisplay');
     }
     grid.classList.add(tlDisplayClassNames[selectDisplay.value]);
-    sdLabel.textContent = sdLabelStrings[selectDisplay.value];
+    sdValue.textContent = sdValueStrings[selectDisplay.value];
     grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
     sdIndexCache = selectDisplay.value;
     if (autoShowNew.note) {
@@ -618,5 +631,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       hTimeline.dispose();
       alert('Escキーが押されたため、タイムラインの受信を停止しました。');
     }
+  });
+
+  menuBtn.addEventListener('click', () => {
+    document.body.classList.toggle('show-config');
+  })
+
+  customOriginForm.addEventListener('submit', () => {
+    if (customOrigin.value !== ioOrigin.replace('https://', '')) {
+      localStorage.setItem('tlOrigin', `https://${customOrigin.value}`);
+    } else {
+      localStorage.removeItem('tlOrigin');
+    }
+    location.reload();
+  });
+
+  resetOriginBtn.addEventListener('click', () => {
+    localStorage.removeItem('tlOrigin');
+    location.reload();
   });
 });

@@ -43,8 +43,23 @@
             <button id="rn-medium-latest">新しいノートを見る</button>
         </div>
     </div>
+    <div class="menu">
+        <button id="menu-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
     <div class="config">
-        <label for="select-display">表示レベル</label><input type="range" id="select-display" value="0" min="0" max="2">
+        <div class="select-display">
+            <label for="select-display">表示レベル<span id="select-display-value"></span></label><input type="range" id="select-display" value="0" min="0" max="2">
+        </div>
+        <div class="custom-origin">
+            <label for="custom-origin">サーバーを指定する</label><form class="field-wrap" name="custom-origin"><input type="text" id="custom-origin" placeholder="misskey.io" required><button id="set-origin">指定</button></form>
+        </div>
+        <div class="reset-origin">
+            <button id="reset-origin">サーバー指定を解除</button>
+        </div>
     </div>
     <div class="confirm-sensitive">
         <div class="wrap">
@@ -54,8 +69,8 @@
                 続行しますか？
             </p>
             <div class="buttons">
-                <button name="yes">はい</button>
-                <button name="no">いいえ</button>
+                <button name="confirm-sensitive" value="yes">はい</button>
+                <button name="confirm-sensitive" value="no">いいえ</button>
             </div>
         </div>
     </div>

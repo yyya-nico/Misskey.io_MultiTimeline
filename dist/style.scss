@@ -60,6 +60,52 @@ body {
     scroll-behavior: smooth;
 }
 
+input[type="range"] {
+    height: 2px;
+    background-color: #e5e5e5;
+    appearance: none;
+
+    &::-webkit-slider-thumb {
+        width: 12px;
+        height: 12px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    &::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        border: 0;
+        background-color: #ffffff;
+        border-radius: 50%;
+        appearance: none;
+        cursor: pointer;
+    }
+}
+
+input[type="text"] {
+    padding: 8px 10px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    color: lightgray;
+    background: #1f1f1f;
+    &::placeholder {
+        color: #7f7f7f;
+    }
+}
+
+button {
+    padding: 5px 13px;
+    border: 0;
+    border-radius: 5px;
+    background-color: #333333;
+    color: lightgray;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
 %notebox {
     display: flex;
     justify-content: space-between;
@@ -488,42 +534,121 @@ body {
     }
 }
 
-.config {
-    display: flex;
-    align-items: center;
-    gap: 12.5px;
+.menu {
     position: fixed;
     top: 0;
     right: 0;
     z-index: 2;
+    width: 54px;
     height: 56px;
-    padding: 15px 12.5px;
     background-color: #0000007f;
-
-    #select-display {
-        width: 80px;
-        height: 2px;
-        background-color: #e5e5e5;
-        appearance: none;
-
-        &::-webkit-slider-thumb {
-            width: 12px;
-            height: 12px;
-            background-color: #ffffff;
-            border-radius: 50%;
-            appearance: none;
-            cursor: pointer;
+    #menu-btn {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        height: 100%;
+        padding: 15px 10px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        span {
+            display: block;
+            transform-origin: left center;
+            width: 100%;
+            height: 2px;
+            border-radius: 1px;
+            background-color: #efefef;
+            transition: ease .4s;
         }
+    }
+}
 
-        &::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            border: 0;
-            background-color: #ffffff;
-            border-radius: 50%;
-            appearance: none;
-            cursor: pointer;
+.config {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    top: 56px;
+    right: 0;
+    z-index: 2;
+    width: 100%;
+    max-width: 300px;
+    height: fit-content;
+    max-height: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #0000007f;
+    transition: ease .4s;
+
+    &.customized-origin {
+        .reset-origin {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
         }
+    }
+
+    .select-display {
+        display: flex;
+        align-items: center;
+        gap: 12.5px;
+        width: 100%;
+        label {
+            display: flex;
+            justify-content: space-between;
+            width: calc(100% - 80px);
+        }
+        #select-display {
+            width: 80px;
+        }
+    }
+    .custom-origin {
+        display: flex;
+        flex-direction: column;
+        gap: 12.5px;
+        .field-wrap {
+            display: flex;
+            #custom-origin {
+                width: calc(100% - 65px);
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            #set-origin {
+                width: 65px;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+    }
+    .reset-origin {
+        display: none;
+    }
+}
+
+body.show-config {
+    .menu {
+        #menu-btn {
+            span {
+                &:nth-child(1) {
+                    transform: translateX(5.5px) rotate(45deg);
+                }
+                &:nth-child(2) {
+                    opacity: 0;
+                }
+                &:nth-child(3) {
+                    transform: translateX(5.5px) rotate(-45deg);
+                }
+            }
+        }
+    }
+    .config {
+        visibility: visible;
+        opacity: 1;
     }
 }
 
@@ -566,14 +691,6 @@ body {
                 gap: 14px;
 
                 button {
-                    padding: 5px 13px;
-                    border: 0;
-                    border-radius: 5px;
-                    background-color: #333333;
-                    color: lightgray;
-                    font-size: 1.2em;
-                    cursor: pointer;
-
                     &[name="yes"] {
                         background-color: gray;
                     }
