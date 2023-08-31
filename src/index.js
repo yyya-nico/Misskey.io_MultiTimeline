@@ -634,6 +634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   await loadTimeline();
   
+  const body = document.body;
   const overlayClickHandler = e => {
     if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {
       body.classList.remove('show-config');
@@ -642,7 +643,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   menuBtn.addEventListener('click', e => {
     e.stopPropagation();
-    const body = document.body;
     body.classList.toggle('show-config');
     if (body.classList.contains('show-config')) {
       body.addEventListener('click', overlayClickHandler);
