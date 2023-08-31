@@ -632,6 +632,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       [noteList, renoteList, mediaList, rnMediaList].forEach(elem => {
         elem.textContent = '';
       });
+      [mediaList, rnMediaList].forEach(elem => {
+        elem.removeAttribute('style');
+      });
     }
   };
   await loadTimeline();
