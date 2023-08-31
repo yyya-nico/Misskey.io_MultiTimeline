@@ -388,10 +388,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
         }
-        if (this === mediaList) {
-          mediaMG.positionItems();
-        } else if (this === rnMediaList) {
-          rnMediaMG.positionItems();
+        if ([...this.children].some(elem => getComputedStyle(elem).display !== 'none')) {
+          if (this === mediaList ) {
+            mediaMG.positionItems();
+          } else if (this === rnMediaList) {
+            rnMediaMG.positionItems();
+          }
         }
       }
       overflowJudgment();
@@ -603,10 +605,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (autoShowNew.renote) {
         scrollToBottom(renoteList.parentElement);
       }
-      if (mediaList.firstElementChild) {
+      if ([...mediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
         mediaMG.positionItems();
       }
-      if (rnMediaList.firstElementChild) {
+      if ([...mediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
         rnMediaMG.positionItems();
       }
     }, {signal: controller.signal});
