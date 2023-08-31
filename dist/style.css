@@ -454,6 +454,7 @@ button {
   border-radius: 20px;
   background-color: #666666;
   color: inherit;
+  font-size: inherit;
   transition: all 0.5s linear;
 }
 .grid .container [id$=-latest].show {
@@ -619,7 +620,7 @@ body.show-config .config {
   display: flex;
   gap: 14px;
 }
-.confirm-sensitive.show .wrap .buttons button[name=yes] {
+.confirm-sensitive.show .wrap .buttons button[value=yes] {
   background-color: gray;
 }
 

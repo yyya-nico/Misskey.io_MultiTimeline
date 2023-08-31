@@ -91,6 +91,7 @@ input[type="text"] {
     border-radius: 5px;
     color: lightgray;
     background: #1f1f1f;
+
     &::placeholder {
         color: #7f7f7f;
     }
@@ -126,7 +127,7 @@ button {
         #notes-list,
         #renotes-list,
         #media-list,
-        #rn-media-list  {
+        #rn-media-list {
             >.contains-sensitive {
                 display: none;
             }
@@ -190,7 +191,7 @@ button {
             flex-direction: column;
             background-color: #1f1f1fcc;
 
-            > :first-child {
+            >:first-child {
                 margin-top: auto;
             }
 
@@ -465,7 +466,7 @@ button {
                             &:hover {
                                 text-decoration: initial;
                             }
-                            
+
                             br {
                                 display: inline;
                             }
@@ -509,6 +510,7 @@ button {
             border-radius: 20px;
             background-color: #666666;
             color: inherit;
+            font-size: inherit;
             transition: all .5s linear;
 
             &.show {
@@ -542,6 +544,7 @@ button {
     width: 54px;
     height: 56px;
     background-color: #0000007f;
+
     #menu-btn {
         display: flex;
         flex-direction: column;
@@ -553,6 +556,7 @@ button {
         background: transparent;
         color: inherit;
         cursor: pointer;
+
         span {
             display: block;
             transform-origin: left center;
@@ -598,26 +602,32 @@ button {
         align-items: center;
         gap: 12.5px;
         width: 100%;
+
         label {
             display: flex;
             justify-content: space-between;
             width: calc(100% - 80px);
         }
+
         #select-display {
             width: 80px;
         }
     }
+
     .custom-origin {
         display: flex;
         flex-direction: column;
         gap: 12.5px;
+
         .field-wrap {
             display: flex;
+
             #custom-origin {
                 width: calc(100% - 65px);
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
+
             #set-origin {
                 width: 65px;
                 border-top-left-radius: 0;
@@ -625,6 +635,7 @@ button {
             }
         }
     }
+
     .reset-origin {
         display: none;
     }
@@ -637,15 +648,18 @@ body.show-config {
                 &:nth-child(1) {
                     transform: translateX(5.5px) rotate(45deg);
                 }
+
                 &:nth-child(2) {
                     opacity: 0;
                 }
+
                 &:nth-child(3) {
                     transform: translateX(5.5px) rotate(-45deg);
                 }
             }
         }
     }
+
     .config {
         visibility: visible;
         opacity: 1;
@@ -691,7 +705,7 @@ body.show-config {
                 gap: 14px;
 
                 button {
-                    &[name="yes"] {
+                    &[value="yes"] {
                         background-color: gray;
                     }
                 }
