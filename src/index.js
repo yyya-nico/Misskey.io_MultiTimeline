@@ -654,8 +654,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   await loadTimeline();
   
-  menuBtn.addEventListener('click', () => {
-    document.body.classList.toggle('show-config');
+  const overlayClickHandler = e => {
+    if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {
+      body.classList.remove('show-config');
+      body.removeEventListener('click', overlayClickHandler);
+    }
+  }
+  menuBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const body = document.body;
+    body.classList.toggle('show-config');
+    if (body.classList.contains('show-config')) {
+      body.addEventListener('click', overlayClickHandler);
+    } else {
+      body.removeEventListener('click', overlayClickHandler);
+    }
   });
   
   customHostForm.addEventListener('submit', async e => {
