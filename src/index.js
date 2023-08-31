@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if ([...mediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
         mediaMG.positionItems();
       }
-      if ([...mediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
+      if ([...rnMediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
         rnMediaMG.positionItems();
       }
     }, {signal: controller.signal});
