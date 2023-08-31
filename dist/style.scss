@@ -590,8 +590,8 @@ button {
     background-color: #0000007f;
     transition: ease .4s;
 
-    &.customized-origin {
-        .reset-origin {
+    &.customized-host {
+        .reset-host {
             display: flex;
             justify-content: center;
             margin-top: 25px;
@@ -615,7 +615,7 @@ button {
         }
     }
 
-    .custom-origin {
+    .custom-host {
         display: flex;
         flex-direction: column;
         gap: 12.5px;
@@ -623,13 +623,13 @@ button {
         .field-wrap {
             display: flex;
 
-            #custom-origin {
+            #custom-host {
                 width: calc(100% - 65px);
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
 
-            #set-origin {
+            #set-host {
                 width: 65px;
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
@@ -637,7 +637,7 @@ button {
         }
     }
 
-    .reset-origin {
+    .reset-host {
         display: none;
     }
 }

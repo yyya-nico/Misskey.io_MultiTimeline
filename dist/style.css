@@ -529,7 +529,7 @@ button {
   background-color: rgba(0, 0, 0, 0.4980392157);
   transition: ease 0.4s;
 }
-.config.customized-origin .reset-origin {
+.config.customized-host .reset-host {
   display: flex;
   justify-content: center;
   margin-top: 25px;
@@ -548,25 +548,25 @@ button {
 .config .select-display #select-display {
   width: 80px;
 }
-.config .custom-origin {
+.config .custom-host {
   display: flex;
   flex-direction: column;
   gap: 12.5px;
 }
-.config .custom-origin .field-wrap {
+.config .custom-host .field-wrap {
   display: flex;
 }
-.config .custom-origin .field-wrap #custom-origin {
+.config .custom-host .field-wrap #custom-host {
   width: calc(100% - 65px);
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-.config .custom-origin .field-wrap #set-origin {
+.config .custom-host .field-wrap #set-host {
   width: 65px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-.config .reset-origin {
+.config .reset-host {
   display: none;
 }
 
