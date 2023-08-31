@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selecting = false;
         return;
       }
-      if (e.target.classList.closest('.is-long')) {
+      if (e.target.closest('.is-long')) {
         e.target.closest('.is-long').classList.toggle('is-open');
       }
       if (e.target.closest('#media-list')) {
