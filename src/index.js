@@ -322,11 +322,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (e.target.closest('.is-long')) {
         e.target.closest('.is-long').classList.toggle('is-open');
-      }
-      if (e.target.closest('#media-list')) {
-        mediaMG.positionItems();
-      } else if (e.target.closest('#rn-media-list')) {
-        rnMediaMG.positionItems();
+        if (e.currentTarget === mediaList) {
+          mediaMG.positionItems();
+        } else if (e.currentTarget === rnMediaList) {
+          rnMediaMG.positionItems();
+        }
       }
     }
   
