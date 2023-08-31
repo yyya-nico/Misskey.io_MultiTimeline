@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         alert('Escキーが押されたため、タイムラインの受信を停止しました。');
       }
-    }, {once: true, signal: controller.signal});
+    }, {signal: controller.signal});
 
     loadTimeline.dispose = () => {
       hTimeline.dispose();
