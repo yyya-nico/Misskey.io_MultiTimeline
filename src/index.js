@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, {signal: controller.signal});
   
     hTimeline.on('note', async note => {
-      console.log(note);
+      // console.log(note);
       const isRenote = Boolean(note.renoteId);
       const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
       if (isNoteOrQuote) {
