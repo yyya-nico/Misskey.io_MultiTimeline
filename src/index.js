@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
         <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
-          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}">
+          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" style="aspect-ratio: ${firstFile.properties.width} / ${firstFile.properties.height}">
           ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
           ${formatted.fileCount}
         </a>${formatted.text &&`
@@ -388,30 +388,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
         }
-        const notesLength = !isNote && noteOrNotes.length || 1;
-        const displayedElems = [...this.children]
-          .slice(0, notesLength)
-          .filter(elem => getComputedStyle(elem).display !== 'none');
-        let foundImg = false;
-        displayedElems.forEach(elem => {
-          const img = elem.querySelector('img');
-          foundImg = img && true;
-          if (img && img.src !== '') {
-            img.addEventListener('load', () => {
-              if (this === mediaList) {
-                mediaMG.positionItems();
-              } else if (this === rnMediaList) {
-                rnMediaMG.positionItems();
-              }
-            }, {once: true});
-          }
-        });
-        if (!foundImg) {
-          if (this === mediaList) {
-            mediaMG.positionItems();
-          } else if (this === rnMediaList) {
-            rnMediaMG.positionItems();
-          }
+        if (this === mediaList) {
+          mediaMG.positionItems();
+        } else if (this === rnMediaList) {
+          rnMediaMG.positionItems();
         }
       }
       overflowJudgment();
@@ -437,7 +417,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, {signal: controller.signal});
   
     hTimeline.on('note', async note => {
-      // console.log(note);
+      console.log(note);
       const isRenote = Boolean(note.renoteId);
       const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
       if (isNoteOrQuote) {
