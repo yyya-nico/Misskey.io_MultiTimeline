@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
         <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
-          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" style="aspect-ratio: ${firstFile.properties.width} / ${firstFile.properties.height}">
+          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" ${firstFile.type.includes('image') ? `style="aspect-ratio: ${firstFile.properties.width} / ${firstFile.properties.height}"` : ''}>
           ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
           ${formatted.fileCount}
         </a>${formatted.text &&`
