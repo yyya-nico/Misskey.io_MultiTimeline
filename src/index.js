@@ -121,7 +121,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       // }
       if (!(name in emojiShortcodeToUrlDic)) {
         const targetOrigin = host ? `https://${host}` : currentOrigin;
-        await fetch(`${targetOrigin}/api/emoji?name=${name}`)
+        await fetch(`${targetOrigin}/api/emoji`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: name
+          })
+        })
           .then((response) => response.json())
           .then((data) => {
             if (data.error) {
