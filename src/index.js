@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.addEventListener('pointerup', () => {
         selecting = !window.getSelection().isCollapsed;
       }, {once: true, signal: controller.signal});
-    });
+    }, {signal: controller.signal});
   
     const textToggleHandler = e => {
       if (selecting) {
