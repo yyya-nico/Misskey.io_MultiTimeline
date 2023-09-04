@@ -22,6 +22,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resetHostBtn = document.getElementById('reset-host');
   const ioOrigin = 'https://misskey.io';
   const defaultTitle = document.title;
+  const mediaMG = new MagicGrid({
+    container: mediaList,
+    items: 1,
+    gutter: 20,
+    animate: true
+  });
+  const rnMediaMG = new MagicGrid({
+    container: rnMediaList,
+    items: 1,
+    gutter: 20,
+    animate: true
+  });
+  mediaMG.listen();
+  rnMediaMG.listen();
   const loadTimeline = async () => {
     let currentOrigin;
     if (localStorage.getItem('tlOrigin')) {
@@ -54,24 +68,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const emojiShortcodeToUrlDic = {};
     const noteLimit = 150;
-    const mediaMG = new MagicGrid({
-      container: mediaList,
-      items: 1,
-      gutter: 20,
-      animate: true
-    });
-    const rnMediaMG = new MagicGrid({
-      container: rnMediaList,
-      items: 1,
-      gutter: 20,
-      animate: true
-    });
     const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
     const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
     const controller = new AbortController();
     let wakeLock = null;
-    mediaMG.listen();
-    rnMediaMG.listen();
   
     const scrollToBottom = node => {
       node.scrollTop = node.scrollHeight;
