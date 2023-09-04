@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let wakeLock = null;
   
     const scrollToBottom = node => {
-      node.scrollTop = node.scrollHeight;
+      node.scrollTo({top: node.scrollHeight});
     }
   
     const htmlspecialchars = unsafeText => {
