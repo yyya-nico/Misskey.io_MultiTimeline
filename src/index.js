@@ -396,7 +396,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
         }
-        if ([...this.children].some(elem => getComputedStyle(elem).display !== 'none')) {
+        const notesLength = !isNote && noteOrNotes.length || 1;
+        const appendedItems = [...this.children].slice(0, notesLength);
+        const videoThumbnailImgs = appendedItems
+          .map(elem => elem.querySelector('img'))
+          .filter(img => img && img.src !== '' && img.style.aspectRatio === '');
+        videoThumbnailImgs.forEach(img => {
+          img.addEventListener('load', () => {
+            if (this === mediaList) {
+              mediaMG.positionItems();
+            } else if (this === rnMediaList) {
+              rnMediaMG.positionItems();
+            }
+          }, {once: true});
+        });
+        const someAppendedItemsAreDisplayed = appendedItems
+          .some(elem => getComputedStyle(elem).display !== 'none');
+        if (someAppendedItemsAreDisplayed) {
           if (this === mediaList ) {
             mediaMG.positionItems();
           } else if (this === rnMediaList) {
