@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renotelatestBtn = document.getElementById('renote-latest');
   const mediumlatestBtn = document.getElementById('medium-latest');
   const rnMediumlatestBtn = document.getElementById('rn-medium-latest');
+  const resizeHandle = document.querySelector('.resize-handle');
   const menuBtn = document.getElementById('menu-btn');
   const configFrame = document.querySelector('.config');
   const selectDisplay = document.getElementById('select-display');
@@ -431,12 +432,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   
     stream.on('_connected_', async () => {
-      // console.log('connected');
+      console.log('connected');
       wakeLock = await navigator.wakeLock.request('screen');
     });
   
     stream.on('_disconnected_', () => {
-      // console.log('disconnected');
+      console.log('disconnected');
       wakeLock.release()
       .then(() => {
         wakeLock = null;
@@ -669,7 +670,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   await loadTimeline();
-  
+
+  const vHeight = window.innerHeight;
+  const headerHeight = 56;
+  if (localStorage.getItem('tlGridHorizontalRatio')) {
+    const ratio = localStorage.getItem('tlGridHorizontalRatio');
+    const contentsHeight = vHeight - headerHeight;
+    const contentsPercentage = contentsHeight / vHeight;
+    const gridPercent = ratio * contentsPercentage;
+    grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
+  }
+  resizeHandle.addEventListener('pointerdown', e => {
+    resizeHandle.classList.add('hover');
+    const onPointerMove = e => {
+      const vHeight = window.innerHeight;
+      const pointerY = Math.round(e.pageY);
+      const contentsHeight = vHeight - headerHeight;
+      const contentsPercentage = contentsHeight / vHeight;
+      const contentsPointerY = pointerY - headerHeight;
+      if (!e.isPrimary || contentsPointerY < 0 || contentsPointerY > contentsHeight ) {
+          return;
+      }
+      const gridHorizontalCenter = contentsHeight / 2;
+      const diffFromCenter = contentsPointerY - gridHorizontalCenter
+      const nearTheMiddle = diffFromCenter <= 15 && diffFromCenter >= -15;
+      if(nearTheMiddle) {
+        grid.removeAttribute('style');
+        localStorage.removeItem('tlGridHorizontalRatio');
+        return;
+      }
+      const ratio = ((pointerY - headerHeight) / (contentsHeight)) * 100;
+      const gridPercent = ratio * contentsPercentage;
+      grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
+      localStorage.setItem('tlGridHorizontalRatio', ratio);
+    }
+    document.addEventListener('pointermove', onPointerMove);
+    const onPointerUp = e => {
+      if (e.isPrimary) {
+        resizeHandle.classList.remove('hover');
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+      }
+    }
+    document.addEventListener('pointerup', onPointerUp);
+  });
+  resizeHandle.addEventListener('dblclick', () => {
+    grid.removeAttribute('style');
+    localStorage.removeItem('tlGridHorizontalRatio');
+  });
+
   const body = document.body;
   const overlayClickHandler = e => {
     if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {

@@ -53,6 +53,7 @@ html *::-webkit-scrollbar-thumb:active {
 body {
     position: relative;
     margin: 0;
+    overflow: hidden;
     background-color: #1f1f1f;
     color: #efefef;
     font-family: 'Noto Sans JP', sans-serif;
@@ -531,6 +532,30 @@ button {
         #medium-latest,
         #rn-medium-latest {
             bottom: calc(100% - 40px - 10px);
+        }
+    }
+
+    .resize-handle {
+        grid-column: 1 / 3;
+        grid-row: 3;
+        z-index: 2;
+        transform: translateY(-50%);
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(0deg, transparent 37.5%, #3f3f3f 37.5%, #3f3f3f 62.5%, transparent 62.5%);
+        cursor: ns-resize;
+        user-select: none;
+        &::before {
+            display: block;
+            width: 100%;
+            height: 100%;
+            transition: all .2s;
+            content: "";
+        }
+        &:hover, &.hover {
+            &::before {
+                background: var(--accent);
+            }
         }
     }
 
