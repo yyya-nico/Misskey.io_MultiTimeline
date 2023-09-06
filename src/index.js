@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         this.insertAdjacentHTML('afterbegin', html);
         if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
-          this.parentElement.scrollTop = 0;
+          this.parentElement.scrollTo({top: 0});
         }
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
