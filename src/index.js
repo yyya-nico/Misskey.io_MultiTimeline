@@ -17,10 +17,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const configFrame = document.querySelector('.config');
   const selectDisplay = document.getElementById('select-display');
   const sdValue = document.getElementById('select-display-value');
+  const misskeyLink = document.querySelector('.misskey-link');
+  const mlLink = misskeyLink.querySelector('a');
+  const mlHost = misskeyLink.querySelector('.host');
   const customHostForm = document.forms['custom-host'];
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
   const ioOrigin = 'https://misskey.io';
+  const defaultMlHost = mlHost.textContent;
   const defaultTitle = document.title;
   const mediaMG = new MagicGrid({
     container: mediaList,
@@ -42,14 +46,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentOrigin = localStorage.getItem('tlOrigin');
       const host = currentOrigin.replace('https://', '');
       document.title = `${host} マルチタイムライン`
+      mlHost.textContent = host;
       customHost.value = host;
       configFrame.classList.add('customized-host');
     } else {
       currentOrigin = ioOrigin;
       document.title = defaultTitle;
+      mlHost.textContent = defaultMlHost;
       customHost.value = '';
       configFrame.classList.remove('customized-host');
     }
+    mlLink.href = currentOrigin;
     const stream = new misskeyStream(currentOrigin);
     const hTimeline = stream.useChannel('localTimeline');
     // const stream = new misskeyStream(currentOrigin, {token: ''});

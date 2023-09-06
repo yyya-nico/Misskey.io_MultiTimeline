@@ -58,6 +58,14 @@ body {
   scroll-behavior: smooth;
 }
 
+a {
+  color: #24d7ce;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
 input[type=range] {
   height: 2px;
   background-color: #e5e5e5;
@@ -302,11 +310,6 @@ button {
   flex-shrink: 0;
   align-self: flex-end;
   color: #7f7f7f;
-  text-decoration: none;
-}
-.grid .container #notes-list > li .time:hover,
-.grid .container #renotes-list > li .time:hover {
-  text-decoration: underline;
 }
 .grid .container #renotes-list > li > .renote-info {
   padding: 5px 10px 2px;

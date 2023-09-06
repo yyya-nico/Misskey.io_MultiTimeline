@@ -60,6 +60,14 @@ body {
     scroll-behavior: smooth;
 }
 
+a {
+    color: #24d7ce;
+    text-decoration: none;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 input[type="range"] {
     height: 2px;
     background-color: #e5e5e5;
@@ -330,11 +338,6 @@ button {
                     flex-shrink: 0;
                     align-self: flex-end;
                     color: #7f7f7f;
-                    text-decoration: none;
-
-                    &:hover {
-                        text-decoration: underline;
-                    }
                 }
 
                 // + li {
@@ -612,6 +615,12 @@ button {
 
         #select-display {
             width: 80px;
+        }
+    }
+
+    .misskey-link {
+        a {
+
         }
     }
 
