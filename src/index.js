@@ -658,6 +658,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }, {signal: controller.signal});
 
+    loadTimeline.notesScrollToBottom = () => {
+      if (autoShowNew.note) {
+        scrollToBottom(noteList.parentElement);
+      }
+      if (autoShowNew.renote) {
+        scrollToBottom(renoteList.parentElement);
+      }
+    };
+
     loadTimeline.dispose = () => {
       hTimeline.dispose();
       controller.abort();
@@ -703,6 +712,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const gridPercent = ratio * contentsPercentage;
       grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
       localStorage.setItem('tlGridHorizontalRatio', ratio);
+      loadTimeline.notesScrollToBottom();
     }
     document.addEventListener('pointermove', onPointerMove);
     const onPointerUp = e => {
