@@ -545,6 +545,7 @@ button {
         background: linear-gradient(0deg, transparent 37.5%, #3f3f3f 37.5%, #3f3f3f 62.5%, transparent 62.5%);
         cursor: ns-resize;
         user-select: none;
+        touch-action: none;
         &::before {
             display: block;
             width: 100%;
