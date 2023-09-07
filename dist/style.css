@@ -494,7 +494,7 @@ button {
   transition: all 0.2s;
   content: "";
 }
-.grid .resize-handle:hover::before, .grid .resize-handle.hover::before {
+.grid .resize-handle.hover::before {
   background-color: var(--accent);
 }
 @media (max-width: 1023px) {
@@ -510,11 +510,11 @@ button {
     transform: translateY(-50%);
     width: 54px;
     height: 40px;
-    background-color: #3f3f3f;
+    background-color: rgba(63, 63, 63, 0.8);
     transition: all 0.2s;
     content: "";
   }
-  .grid .resize-handle:hover::after, .grid .resize-handle.hover::after {
+  .grid .resize-handle.hover::after {
     background-color: var(--accent);
   }
 }

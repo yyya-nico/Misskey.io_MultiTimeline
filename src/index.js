@@ -686,22 +686,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
   await loadTimeline();
 
-  const vHeight = window.innerHeight;
+  const gridClientHeight = grid.clientHeight;
   const headerHeight = 56;
   if (localStorage.getItem('tlGridHorizontalRatio')) {
     const ratio = localStorage.getItem('tlGridHorizontalRatio');
-    const contentsHeight = vHeight - headerHeight;
-    const contentsPercentage = contentsHeight / vHeight;
+    const contentsHeight = gridClientHeight - headerHeight;
+    const contentsPercentage = contentsHeight / gridClientHeight;
     const gridPercent = ratio * contentsPercentage;
     grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
   }
-  resizeHandle.addEventListener('pointerdown', e => {
+  const onPointerLeave = () => {
+    resizeHandle.classList.remove('hover');
+  }
+  resizeHandle.addEventListener('pointerenter', () => {
     resizeHandle.classList.add('hover');
+  });
+  resizeHandle.addEventListener('pointerleave', onPointerLeave);
+  resizeHandle.addEventListener('pointerdown', e => {
+    resizeHandle.removeEventListener('pointerleave', onPointerLeave);
     const onPointerMove = e => {
-      const vHeight = window.innerHeight;
+      const gridClientHeight = grid.clientHeight;
       const pointerY = Math.round(e.pageY);
-      const contentsHeight = vHeight - headerHeight;
-      const contentsPercentage = contentsHeight / vHeight;
+      const contentsHeight = gridClientHeight - headerHeight;
+      const contentsPercentage = contentsHeight / gridClientHeight;
       const contentsPointerY = pointerY - headerHeight;
       if (!e.isPrimary || contentsPointerY < 0 || contentsPointerY > contentsHeight ) {
           return;
@@ -733,6 +740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         resizeHandle.classList.remove('hover');
         document.removeEventListener('pointermove', onPointerMove);
         document.removeEventListener('pointerup', onPointerUp);
+        resizeHandle.addEventListener('pointerleave', onPointerLeave);
       }
     }
     document.addEventListener('pointerup', onPointerUp);
