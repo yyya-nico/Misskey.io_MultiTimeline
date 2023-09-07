@@ -378,6 +378,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } else if (this === mediaList || this === rnMediaList) {
         const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
+        const notesLengthCache = !isNote && noteOrNotes.length || 1;
         if (isNote) {
           const note = noteOrNotes;
           if (target == 'renote') {
@@ -404,12 +405,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
         }
-        // console.log(this.id, 'before PositionItems()');
+        // console.log(this.id, 'before positionItems()');
         // console.time(this.id);
-        const notesLength = !isNote && noteOrNotes.length || 1;
-        const appendedItems = [...this.children].slice(0, notesLength);
+        const appendedItems = [...this.children].slice(0, notesLengthCache);
         const someAppendedItemsAreDisplayed = appendedItems
           .some(elem => getComputedStyle(elem).display !== 'none');
+        // this === rnMediaList && console.log(appendedItems, someAppendedItemsAreDisplayed);
         if (someAppendedItemsAreDisplayed) {
           if (this === mediaList ) {
             mediaMG.positionItems();
