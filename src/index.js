@@ -738,19 +738,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const body = document.body;
-  const overlayClickHandler = e => {
+  const overlayPointerdownHandler = e => {
     if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {
       body.classList.remove('show-config');
-      body.removeEventListener('click', overlayClickHandler);
+      body.removeEventListener('pointerdown', overlayPointerdownHandler);
     }
   }
+  menuBtn.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+  });
   menuBtn.addEventListener('click', e => {
     e.stopPropagation();
     body.classList.toggle('show-config');
     if (body.classList.contains('show-config')) {
-      body.addEventListener('click', overlayClickHandler);
+      body.addEventListener('pointerdown', overlayPointerdownHandler);
     } else {
-      body.removeEventListener('click', overlayClickHandler);
+      body.removeEventListener('pointerdown', overlayPointerdownHandler);
     }
   });
   
