@@ -706,6 +706,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if(nearTheMiddle) {
         grid.removeAttribute('style');
         localStorage.removeItem('tlGridHorizontalRatio');
+        loadTimeline.notesScrollToBottom();
         return;
       }
       const ratio = ((pointerY - headerHeight) / (contentsHeight)) * 100;
@@ -727,6 +728,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   resizeHandle.addEventListener('dblclick', () => {
     grid.removeAttribute('style');
     localStorage.removeItem('tlGridHorizontalRatio');
+    loadTimeline.notesScrollToBottom();
   });
 
   const body = document.body;
