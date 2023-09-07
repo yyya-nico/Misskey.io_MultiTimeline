@@ -5,6 +5,7 @@ import MagicGrid from 'magic-grid';
 document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.querySelector('.grid');
   const containers = document.querySelectorAll('.container');
+  const mediaContainers = [...containers].filter(container => ['media','rn-media'].some(className => container.classList.contains(className)));
   const noteList = document.getElementById('notes-list');
   const renoteList = document.getElementById('renotes-list');
   const mediaList = document.getElementById('media-list');
@@ -694,6 +695,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contentsPercentage = contentsHeight / gridClientHeight;
     const gridPercent = ratio * contentsPercentage;
     grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
+    mediaContainers.forEach(container => {
+      container.style.paddingBottom = `${(contentsPercentage * 100 - gridPercent) * (gridClientHeight / window.innerHeight)}dvh`;
+    });
   }
   const onPointerLeave = () => {
     resizeHandle.classList.remove('hover');
@@ -720,6 +724,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if(nearTheMiddle) {
         grid.removeAttribute('style');
         localStorage.removeItem('tlGridHorizontalRatio');
+        mediaContainers.forEach(container => {
+          container.removeAttribute('style');
+        });
         loadTimeline.notesScrollToBottom();
         return;
       } else if (contentsPointerY <= 15) {
@@ -732,6 +739,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const gridPercent = ratio * contentsPercentage;
       grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
       localStorage.setItem('tlGridHorizontalRatio', ratio);
+      mediaContainers.forEach(container => {
+        container.style.paddingBottom = `${(contentsPercentage * 100 - gridPercent) * (gridClientHeight / window.innerHeight)}dvh`;
+      });
       loadTimeline.notesScrollToBottom();
     }
     document.addEventListener('pointermove', onPointerMove);
@@ -748,6 +758,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   resizeHandle.addEventListener('dblclick', () => {
     grid.removeAttribute('style');
     localStorage.removeItem('tlGridHorizontalRatio');
+    mediaContainers.forEach(container => {
+      container.removeAttribute('style');
+    });
     loadTimeline.notesScrollToBottom();
   });
 
