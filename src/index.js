@@ -404,6 +404,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (this.querySelectorAll('li').length > noteLimit) {
           this.lastElementChild.remove();
         }
+        // console.log(this.id, 'before PositionItems()');
+        // console.time(this.id);
         const notesLength = !isNote && noteOrNotes.length || 1;
         const appendedItems = [...this.children].slice(0, notesLength);
         const someAppendedItemsAreDisplayed = appendedItems
@@ -414,7 +416,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else if (this === rnMediaList) {
             rnMediaMG.positionItems();
           }
+          // console.log(this.id, 'positionItems()');
         }
+        // console.timeEnd(this.id);
         const videoThumbnailImgs = appendedItems
           .map(elem => elem.querySelector('img'))
           .filter(img => img && img.style.aspectRatio === '' && img.src !== '');
@@ -426,6 +430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               rnMediaMG.positionItems();
             }
           }, {once: true});
+          // console.log('videoThumbnailImgs', img);
         });
       }
       overflowJudgment();
