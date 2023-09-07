@@ -51,9 +51,7 @@ html *::-webkit-scrollbar-thumb:active {
 }
 
 body {
-    position: relative;
     margin: 0;
-    overflow: hidden;
     background-color: #1f1f1f;
     color: #efefef;
     font-family: 'Noto Sans JP', sans-serif;
@@ -131,6 +129,7 @@ button {
     grid-template-rows: 56px repeat(2, calc(50% - 56px / 2));
     height: 100vh;
     height: 100dvh;
+    overflow: hidden;
 
     &.hide-sensitive {
 

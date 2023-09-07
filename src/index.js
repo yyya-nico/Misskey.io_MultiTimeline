@@ -703,13 +703,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const gridHorizontalCenter = contentsHeight / 2;
       const diffFromCenter = contentsPointerY - gridHorizontalCenter
       const nearTheMiddle = diffFromCenter <= 15 && diffFromCenter >= -15;
+      let ratio;
       if(nearTheMiddle) {
         grid.removeAttribute('style');
         localStorage.removeItem('tlGridHorizontalRatio');
         loadTimeline.notesScrollToBottom();
         return;
+      } else if (contentsPointerY <= 15) {
+        ratio = 0;
+      } else if (contentsHeight - contentsPointerY <= 15) {
+        ratio = 100;
+      } else {
+        ratio = (contentsPointerY / contentsHeight) * 100;
       }
-      const ratio = ((pointerY - headerHeight) / (contentsHeight)) * 100;
       const gridPercent = ratio * contentsPercentage;
       grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
       localStorage.setItem('tlGridHorizontalRatio', ratio);
