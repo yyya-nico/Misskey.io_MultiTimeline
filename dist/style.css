@@ -495,12 +495,27 @@ button {
   content: "";
 }
 .grid .resize-handle:hover::before, .grid .resize-handle.hover::before {
-  background: var(--accent);
+  background-color: var(--accent);
 }
 @media (max-width: 1023px) {
   .grid {
     grid-template-columns: repeat(2, 90%);
     overflow-x: auto;
+  }
+  .grid .resize-handle::after {
+    display: block;
+    position: sticky;
+    top: 2px;
+    left: calc(100vw - 54px);
+    transform: translateY(-50%);
+    width: 54px;
+    height: 40px;
+    background-color: #3f3f3f;
+    transition: all 0.2s;
+    content: "";
+  }
+  .grid .resize-handle:hover::after, .grid .resize-handle.hover::after {
+    background-color: var(--accent);
   }
 }
 

@@ -554,7 +554,7 @@ button {
         }
         &:hover, &.hover {
             &::before {
-                background: var(--accent);
+                background-color: var(--accent);
             }
         }
     }
@@ -562,6 +562,25 @@ button {
     @media (max-width: 1023px) {
         grid-template-columns: repeat(2, 90%);
         overflow-x: auto;
+        .resize-handle {
+            &::after {
+                display: block;
+                position: sticky;
+                top: 2px;
+                left: calc(100vw - 54px);
+                transform: translateY(-50%);
+                width: 54px;
+                height: 40px;
+                background-color: #3f3f3f;
+                transition: all .2s;
+                content: "";
+            }
+            &:hover, &.hover {
+                &::after {
+                    background-color: var(--accent);
+                }
+            }
+        }
     }
 }
 
