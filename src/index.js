@@ -289,6 +289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const makeHTMLFromNoteForMedia = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
+      renote && (renote.host = renote.user.host);
       const targetNote = target === 'note' && note || target === 'renote' && renote;
       const firstFile = targetNote.files[0];
       const formatted = {
