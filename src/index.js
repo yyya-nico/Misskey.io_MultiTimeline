@@ -139,13 +139,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             name: name
           })
         })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.error) {
-              // console.log('error');
-              emojiShortcodeToUrlDic[name] = null;
-            } else {
+          .then(async (response) => {
+            const data = await response.json();
+            if (response.status === 200) {
               emojiShortcodeToUrlDic[name] = data.url;
+            } else {
+              // console.log('error or no content');
+              emojiShortcodeToUrlDic[name] = null;
             }
           }).catch((e) => {
             // console.log('catch');
