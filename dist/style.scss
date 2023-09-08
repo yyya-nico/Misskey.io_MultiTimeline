@@ -620,7 +620,6 @@ button {
 .config {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 18px;
     visibility: hidden;
     opacity: 0;
@@ -662,6 +661,10 @@ button {
         }
     }
 
+    .misskey-link {
+        align-self: flex-end;
+    }
+
     .custom-host {
         display: flex;
         flex-direction: column;
@@ -686,6 +689,14 @@ button {
 
     .reset-host {
         display: none;
+    }
+
+    .clear-emojis-cache {
+        display: flex;
+        justify-content: center;
+        #clear-emojis-cache {
+            font-size: 14px;
+        }
     }
 }
 

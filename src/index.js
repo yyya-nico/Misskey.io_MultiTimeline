@@ -21,12 +21,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sdValue = document.getElementById('select-display-value');
   const misskeyLink = document.querySelector('.misskey-link');
   const mlLink = misskeyLink.querySelector('a');
-  const mlHost = misskeyLink.querySelector('.host');
+  const hostTextWraps = document.querySelectorAll('.host');
+  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const customHostForm = document.forms['custom-host'];
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
   const ioOrigin = 'https://misskey.io';
-  const defaultMlHost = mlHost.textContent;
+  const defaultHostText = hostTextWraps[0].textContent;
   const defaultTitle = document.title;
   const mediaMG = new MagicGrid({
     container: mediaList,
@@ -42,26 +43,65 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   mediaMG.listen();
   rnMediaMG.listen();
-  const loadTimeline = async () => {
-    let currentOrigin;
+  let currentOrigin, host;
+  const originToHost = origin => origin.replace('https://', '');
+
+  const initOrigin = () => {
     if (localStorage.getItem('tlOrigin')) {
       currentOrigin = localStorage.getItem('tlOrigin');
-      const host = currentOrigin.replace('https://', '');
+      host = originToHost(currentOrigin);
       document.title = `${host} マルチタイムライン`
-      mlHost.textContent = host;
+      hostTextWraps.forEach(hostTextWrap => {
+        hostTextWrap.textContent = host;
+      });
       customHost.value = host;
       configFrame.classList.add('customized-host');
     } else {
       currentOrigin = ioOrigin;
+      host = originToHost(currentOrigin);
       document.title = defaultTitle;
-      mlHost.textContent = defaultMlHost;
+      hostTextWraps.forEach(hostTextWrap => {
+        hostTextWrap.textContent = defaultHostText;
+      });
       customHost.value = '';
       configFrame.classList.remove('customized-host');
     }
     mlLink.href = currentOrigin;
-    const stream = new misskeyStream(currentOrigin);
+  }
+  initOrigin();
+
+  const emojiShortcodeToUrlDic = {};
+  const initEmojis = async origin => {
+    const host = originToHost(origin);
+    if (localStorage.getItem(`tlEmojis${host}`)) {
+      emojiShortcodeToUrlDic[host] = JSON.parse(localStorage.getItem(`tlEmojis${host}`));
+      return;
+    }
+    emojiShortcodeToUrlDic[host] = {};
+    await fetch(`${origin}/api/emojis`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (response.status === 200) {
+          const emojis = data.emojis;
+          emojis.forEach(entry => {
+            emojiShortcodeToUrlDic[host][entry.name] = entry.url;
+          });
+          localStorage.setItem(`tlEmojis${host}`, JSON.stringify(emojiShortcodeToUrlDic[host]));
+        } else {
+          console.log('error or no content', response.status);
+          emojiShortcodeToUrlDic[host] = {};
+        }
+      }).catch((e) => {
+        console.error('Failed to load Emojis', e);
+        emojiShortcodeToUrlDic[host] = {};
+      });
+  }
+
+  const loadTimeline = async origin => {
+    await initEmojis(currentOrigin);
+    const stream = new misskeyStream(origin);
     const hTimeline = stream.useChannel('localTimeline');
-    // const stream = new misskeyStream(currentOrigin, {token: ''});
+    // const stream = new misskeyStream(origin, {token: ''});
     // const hTimeline = stream.useChannel('homeTimeline');
     const autoShowNew = {
       note: true,
@@ -75,7 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       media: [],
       rnMedia: []
     };
-    const emojiShortcodeToUrlDic = {};
     const noteLimit = 150;
     const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
     const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
@@ -128,8 +167,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       // if (host) {
       //   console.log('external host emoji:', name);
       // }
-      if (!(name in emojiShortcodeToUrlDic)) {
-        const targetOrigin = host ? `https://${host}` : currentOrigin;
+      const targetHost = host || originToHost(origin);
+      if (!emojiShortcodeToUrlDic[targetHost]) {
+        emojiShortcodeToUrlDic[targetHost] = {};
+      }
+      if (!(name in emojiShortcodeToUrlDic[targetHost])) {
+        const targetOrigin = host ? `https://${host}` : origin;
         await fetch(`${targetOrigin}/api/emoji`, {
           method: 'POST',
           headers: {
@@ -142,17 +185,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           .then(async (response) => {
             const data = await response.json();
             if (response.status === 200) {
-              emojiShortcodeToUrlDic[name] = data.url;
+              emojiShortcodeToUrlDic[targetHost][name] = data.url;
             } else {
               // console.log('error or no content');
-              emojiShortcodeToUrlDic[name] = null;
+              emojiShortcodeToUrlDic[targetHost][name] = null;
             }
           }).catch((e) => {
             // console.log('catch');
-            emojiShortcodeToUrlDic[name] = null;
+            emojiShortcodeToUrlDic[targetHost][name] = null;
           });
       }
-      return emojiShortcodeToUrlDic[name];
+      return emojiShortcodeToUrlDic[targetHost][name];
     }
     // console.log(emojiShortcodeToUrl('x_z'));
   
@@ -226,16 +269,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
       const html = target === 'note' ? 
       `<li data-id="${note.id}" class="${formatted.containsSensitive}">
-        <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
+        <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${origin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
       </li>
       `
       : target === 'renote' ?
       `<li data-id="${note.id}" class="${formatted.containsSensitive}">
         <div class="renote-info">
-          <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${currentOrigin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
+          <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${origin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
         </div>
         <div class="renoted-note">
-          <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${currentOrigin}/notes/${renote.id}" class="time" target="misskey" rel=”noopener”>${formatted.rnTime}</a>
+          <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${origin}/notes/${renote.id}" class="time" target="misskey" rel=”noopener”>${formatted.rnTime}</a>
         </div>
       </li>
       `
@@ -255,7 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
       const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-        <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
+        <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
           <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" ${firstFile.type.includes('image') ? `style="aspect-ratio: ${firstFile.properties.width} / ${firstFile.properties.height}"` : ''}>
           ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
           ${formatted.fileCount}
@@ -267,7 +310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       `
       : firstFile.type.includes('audio') ?
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-        <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
+        <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
           <span class="file-type">音声</span>
           ${formatted.fileCount}
         </a>${formatted.text &&`
@@ -278,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       `
       : 
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-        <a href="${currentOrigin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
+        <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
           <span class="file-type">その他:${firstFile.type}</span>
           ${formatted.fileCount}
         </a>${formatted.text &&`
@@ -685,7 +728,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   };
-  await loadTimeline();
+  await loadTimeline(currentOrigin);
 
   const gridClientHeight = grid.clientHeight;
   const headerHeight = 56;
@@ -783,21 +826,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       body.removeEventListener('pointerdown', overlayPointerdownHandler);
     }
   });
+
+  clearEmojisCacheBtn.addEventListener('click', async () => {
+    const oldEmojis = localStorage.getItem(`tlEmojis${host}`);
+    localStorage.removeItem(`tlEmojis${host}`);
+    await initEmojis(currentOrigin);
+    const newEmojis = localStorage.getItem(`tlEmojis${host}`);
+    if (oldEmojis === newEmojis) {
+      alert('絵文字URLを再取得しましたが、特に変更はないようです。しばらくたってからお試しください。');
+    } else {
+      alert('絵文字URLを再取得した結果、変更がありました。');
+    }
+  })
   
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
-    if (customHost.value !== ioOrigin.replace('https://', '')) {
+    if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
     } else {
       localStorage.removeItem('tlOrigin');
     }
     loadTimeline.dispose();
-    await loadTimeline();
+    initOrigin();
+    await loadTimeline(currentOrigin);
   });
 
   resetHostBtn.addEventListener('click', async () => {
     localStorage.removeItem('tlOrigin');
     loadTimeline.dispose();
-    await loadTimeline();
+    initOrigin();
+    await loadTimeline(currentOrigin);
   });
 });

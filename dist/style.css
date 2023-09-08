@@ -553,7 +553,6 @@ button {
 .config {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 18px;
   visibility: hidden;
   opacity: 0;
@@ -590,6 +589,9 @@ button {
 .config .select-display #select-display {
   width: 80px;
 }
+.config .misskey-link {
+  align-self: flex-end;
+}
 .config .custom-host {
   display: flex;
   flex-direction: column;
@@ -610,6 +612,13 @@ button {
 }
 .config .reset-host {
   display: none;
+}
+.config .clear-emojis-cache {
+  display: flex;
+  justify-content: center;
+}
+.config .clear-emojis-cache #clear-emojis-cache {
+  font-size: 14px;
 }
 
 body.show-config .menu #menu-btn span:nth-child(1) {
