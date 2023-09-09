@@ -121,25 +121,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
     const controller = new AbortController();
     let wakeLock = null;
+
+    const loadAndStoreEmoji = async (name, host) => {
+      if (!emojiShortcodeToUrlDic[host]) {
+        emojiShortcodeToUrlDic[host] = {};
+      }
+      const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+      await cli.request('emoji', {name: name})
+        .then((data) => {
+          emojiShortcodeToUrlDic[host][name] = data !== null ? data.url : null;
+        }).catch((e) => {
+          // console.log('catch');
+          emojiShortcodeToUrlDic[host][name] = null;
+      });
+    }
   
     const emojiShortcodeToUrl = async (name, host) => {
       // if (host) {
       //   console.log('external host emoji:', name);
       // }
       const targetHost = host || originToHost(origin);
-      if (!emojiShortcodeToUrlDic[targetHost]) {
-        emojiShortcodeToUrlDic[targetHost] = {};
-      }
-      if (!(name in emojiShortcodeToUrlDic[targetHost])) {
-        const targetOrigin = host ? `https://${host}` : origin;
-        const cli = new misskeyApi.APIClient({origin: targetOrigin});
-        await cli.request('emoji', {name: name})
-          .then((data) => {
-            emojiShortcodeToUrlDic[targetHost][name] = data !== null ? data.url : null;
-          }).catch((e) => {
-            // console.log('catch');
-            emojiShortcodeToUrlDic[targetHost][name] = null;
-        });
+      if (!emojiShortcodeToUrlDic[targetHost] || !(name in emojiShortcodeToUrlDic[targetHost])) {
+        await loadAndStoreEmoji(name, targetHost);
       }
       return emojiShortcodeToUrlDic[targetHost][name];
     }
