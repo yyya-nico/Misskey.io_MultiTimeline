@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let wakeLock = null;
 
     const loadAndStoreEmoji = async (name, host) => {
-      if (!emojiShortcodeToUrlDic[host]) {
+      if (!(host in emojiShortcodeToUrlDic)) {
         emojiShortcodeToUrlDic[host] = {};
       }
       const cli = new misskeyApi.APIClient({origin: `https://${host}`});
@@ -133,6 +133,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).catch((e) => {
           // console.log('catch');
           emojiShortcodeToUrlDic[host][name] = null;
+      });
+    }
+
+    const storeExternalEmojisFromNote = note => {
+      const host = note.host;
+      if (!(host in emojiShortcodeToUrlDic)) {
+        emojiShortcodeToUrlDic[host] = {};
+      }
+      Object.keys(note.emojis).forEach(name => {
+        const url = note.emojis[name];
+        emojiShortcodeToUrlDic[host][name] = url;
       });
     }
   
@@ -198,9 +209,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
       renote && (renote.host = renote.user.host);
-      // if (renote.host) {
-      //   console.log('detected external host renote:', renote.host, 'note id:', note.id);
-      // }
+      if (renote.host) {
+        // console.log('detected external host renote:', renote.host, 'note id:', note.id);
+        storeExternalEmojisFromNote(renote);
+      }
       const formatted = {
         name:      note.user.name ? await simpleMfmToHTML(note.user.name) : note.user.username,
         plainName: note.user.name ? note.user.name : note.user.username,
@@ -239,6 +251,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
       renote && (renote.host = renote.user.host);
+      if (renote.host) {
+        storeExternalEmojisFromNote(renote);
+      }
       const targetNote = target === 'note' && note || target === 'renote' && renote;
       const firstFile = targetNote.files[0];
       const formatted = {
