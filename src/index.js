@@ -455,7 +455,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     stream.on('_connected_', async () => {
       console.log('connected');
-      wakeLock = await navigator.wakeLock.request('screen');
+      if (document.visibilityState === 'visible') {
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
     });
   
     stream.on('_disconnected_', () => {
