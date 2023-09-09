@@ -211,13 +211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const makeHTMLFromNote = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
-      if (renote) {
-        renote.host = renote.user.host;
-        if (renote.host) {
-          // console.log('detected external host renote:', renote.host, 'note id:', note.id);
-          storeExternalEmojisFromNote(renote);
-        }
-      }
+      renote && (renote.host = renote.user.host);
       const formatted = {
         name:      note.user.name ? await simpleMfmToHTML(note.user.name) : note.user.username,
         plainName: note.user.name ? note.user.name : note.user.username,
@@ -255,13 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const makeHTMLFromNoteForMedia = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
-      if (renote) {
-        renote.host = renote.user.host;
-        if (renote.host) {
-          // console.log('detected external host renote:', renote.host, 'note id:', note.id);
-          storeExternalEmojisFromNote(renote);
-        }
-      }
+      renote && (renote.host = renote.user.host);
       const targetNote = target === 'note' && note || target === 'renote' && renote;
       const firstFile = targetNote.files[0];
       const formatted = {
@@ -491,6 +479,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
       if (isRenote) {
+        const renote = note.renote;
+        const host = renote.user.host;
+        if (host) {
+          storeExternalEmojisFromNote(renote);
+        }
         if (autoShowNew.renote) {
           await renoteList.appendToTl(note);//RN
         } else {
