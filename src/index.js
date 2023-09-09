@@ -1,4 +1,4 @@
-import { Stream as misskeyStream } from 'misskey-js';
+import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
 import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
 import {scrollToBottom, htmlspecialchars, fromNow} from './utils';
@@ -132,27 +132,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (!(name in emojiShortcodeToUrlDic[targetHost])) {
         const targetOrigin = host ? `https://${host}` : origin;
-        await fetch(`${targetOrigin}/api/emoji`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: name
-          })
-        })
-          .then(async (response) => {
-            const data = await response.json();
-            if (response.status === 200) {
-              emojiShortcodeToUrlDic[targetHost][name] = data.url;
-            } else {
-              // console.log('error or no content');
-              emojiShortcodeToUrlDic[targetHost][name] = null;
-            }
+        const cli = new misskeyApi.APIClient({origin: targetOrigin});
+        await cli.request('emoji', {name: name})
+          .then((data) => {
+            emojiShortcodeToUrlDic[targetHost][name] = data !== null ? data.url : null;
           }).catch((e) => {
             // console.log('catch');
             emojiShortcodeToUrlDic[targetHost][name] = null;
-          });
+        });
       }
       return emojiShortcodeToUrlDic[targetHost][name];
     }
