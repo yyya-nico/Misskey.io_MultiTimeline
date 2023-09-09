@@ -141,9 +141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!(host in emojiShortcodeToUrlDic)) {
         emojiShortcodeToUrlDic[host] = {};
       }
-      Object.keys(note.emojis).forEach(name => {
-        const url = note.emojis[name];
-        emojiShortcodeToUrlDic[host][name] = url;
+      [note.user.emojis, note.emojis].forEach(emojis => {
+        Object.keys(emojis).forEach(name => {
+          const url = emojis[name];
+          emojiShortcodeToUrlDic[host][name] = url;
+        });
       });
     }
   
@@ -208,10 +210,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const makeHTMLFromNote = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
-      renote && (renote.host = renote.user.host);
-      if (renote.host) {
-        // console.log('detected external host renote:', renote.host, 'note id:', note.id);
-        storeExternalEmojisFromNote(renote);
+      if (renote) {
+        renote.host = renote.user.host;
+        if (renote.host) {
+          // console.log('detected external host renote:', renote.host, 'note id:', note.id);
+          storeExternalEmojisFromNote(renote);
+        }
       }
       const formatted = {
         name:      note.user.name ? await simpleMfmToHTML(note.user.name) : note.user.username,
@@ -250,9 +254,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const makeHTMLFromNoteForMedia = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       const renote = note.isRenote ? note.renote : null;
-      renote && (renote.host = renote.user.host);
-      if (renote.host) {
-        storeExternalEmojisFromNote(renote);
+      if (renote) {
+        renote.host = renote.user.host;
+        if (renote.host) {
+          // console.log('detected external host renote:', renote.host, 'note id:', note.id);
+          storeExternalEmojisFromNote(renote);
+        }
       }
       const targetNote = target === 'note' && note || target === 'renote' && renote;
       const firstFile = targetNote.files[0];
