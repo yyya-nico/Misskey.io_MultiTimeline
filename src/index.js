@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           emojiShortcodeToUrlDic[host][name] = url;
         });
       });
+      // console.log(`現在の${host}の絵文字記録:`, emojiShortcodeToUrlDic[host]);
     }
   
     const emojiShortcodeToUrl = async (name, host) => {
