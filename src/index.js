@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const storeExternalEmojisFromNote = note => {
-      const host = note.host;
+      const host = note.user.host;
       if (!(host in emojiShortcodeToUrlDic)) {
         emojiShortcodeToUrlDic[host] = {};
       }
