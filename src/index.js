@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       //   console.log('external host emoji:', name);
       // }
       const targetHost = host || originToHost(origin);
-      if (!emojiShortcodeToUrlDic[targetHost] || !(name in emojiShortcodeToUrlDic[targetHost])) {
+      if (!(targetHost in emojiShortcodeToUrlDic) || !(name in emojiShortcodeToUrlDic[targetHost])) {
         await loadAndStoreEmoji(name, targetHost);
       }
       return emojiShortcodeToUrlDic[targetHost][name];
