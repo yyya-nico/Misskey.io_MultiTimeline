@@ -101,7 +101,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadTimeline = async origin => {
     await initEmojis(currentOrigin);
     const stream = new misskeyStream(origin);
-    const hTimeline = stream.useChannel('localTimeline');
+    const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
+    const hTimeline = stream.useChannel(channelNames[1]);
     // const stream = new misskeyStream(origin, {token: ''});
     // const hTimeline = stream.useChannel('homeTimeline');
     const autoShowNew = {
@@ -210,12 +211,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     const makeHTMLFromNote = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
+      note.host = note.user.host;
       const renote = note.isRenote ? note.renote : null;
       renote && (renote.host = renote.user.host);
       const formatted = {
-        name:      note.user.name ? await simpleMfmToHTML(note.user.name) : note.user.username,
+        name:      note.user.name ? await simpleMfmToHTML(note.user.name, note.host) : note.user.username,
         plainName: note.user.name ? note.user.name : note.user.username,
-        text:      await makeTextHTMLFromNote(note),
+        text:      await makeTextHTMLFromNote(note, note.host),
         fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '', 
         time:      new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}),
         containsSensitive: (detectSensitiveFile(note) || renote && detectSensitiveFile(renote)) ? 'contains-sensitive' : '',
@@ -248,12 +250,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     const makeHTMLFromNoteForMedia = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
+      note.host = note.user.host;
       const renote = note.isRenote ? note.renote : null;
       renote && (renote.host = renote.user.host);
       const targetNote = target === 'note' && note || target === 'renote' && renote;
       const firstFile = targetNote.files[0];
       const formatted = {
-        text:      await makeTextHTMLFromNote(targetNote, renote && renote.host),
+        text:      await makeTextHTMLFromNote(targetNote, targetNote.host),
         fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
         containsSensitive: detectSensitiveFile(targetNote) || targetNote.cw !== null ? 'contains-sensitive' : ''
       };
@@ -467,6 +470,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // console.log(note);
       const isRenote = Boolean(note.renoteId);
       const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
+      const host = note.user.host;
+      if (host) {
+        storeExternalEmojisFromNote(note);
+      }
       if (isNoteOrQuote) {
         if (autoShowNew.note) {
           await noteList.appendToTl(note);//RN以外
