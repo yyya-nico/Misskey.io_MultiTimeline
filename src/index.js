@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .then((data) => {
           emojiShortcodeToUrlDic[host][name] = data !== null ? data.url : null;
         }).catch((e) => {
-          // console.log('catch');
+          console.log('Emoji', `:${name}:`, 'from', host,'is not found:', e);
           emojiShortcodeToUrlDic[host][name] = null;
       });
     }
