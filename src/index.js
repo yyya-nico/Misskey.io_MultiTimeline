@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   mediaMG.listen();
   rnMediaMG.listen();
   let currentOrigin, host;
-  let channelIndex = 1;
-  selectTimeline.value = channelIndex;
+  let timelineIndex = 1;
+  selectTimeline.value = timelineIndex;
   const originToHost = origin => origin.replace('https://', '');
 
   const initOrigin = () => {
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initEmojis(origin);
     const stream = new misskeyStream(origin);
     const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
-    const hTimeline = stream.useChannel(channelNames[channelIndex]);
+    const hTimeline = stream.useChannel(channelNames[timelineIndex]);
     // const stream = new misskeyStream(origin, {token: ''});
     // const hTimeline = stream.useChannel('homeTimeline');
     const autoShowNew = {
@@ -469,8 +469,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         wakeLock = await navigator.wakeLock.request('screen');
       }
     }, {signal: controller.signal});
-  
-    hTimeline.on('note', async note => {
+
+    const parseNote = async note => {
       // console.log(note);
       const isRenote = Boolean(note.renoteId);
       const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
@@ -531,7 +531,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       }
+    }
+
+    const apiTimelineEndpoints = ['timeline','local-timeline','hybrid-timeline','global-timeline'];
+    const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+    await cli.request(`notes/${apiTimelineEndpoints[timelineIndex]}`, {limit: 15})
+      .then(async (notes) => {
+        notes = notes.reverse();
+        let p = Promise.resolve();
+        notes.forEach(note => p = p.then(() => parseNote(note)));
+        await p;
+      }).catch((e) => {
+        console.log(`${host}\'s`, `notes/${apiTimelineEndpoints[timelineIndex]}`, 'could not load');
+        console.dir(e);
     });
+    // console.log(noteList.children.length + renoteList.children.length);
+
+    hTimeline.on('note', parseNote);
   
     const latestBtnHandler = async e => {
       const latestBtn = e.target;
@@ -808,7 +824,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   selectTimeline.addEventListener('change', async () => {
     loadTimeline.dispose();
-    channelIndex = Number(selectTimeline.value);
+    timelineIndex = Number(selectTimeline.value);
     await loadTimeline(currentOrigin);
   });
   
@@ -821,8 +837,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     loadTimeline.dispose();
     initOrigin();
-    channelIndex = 1;
-    selectTimeline.value = channelIndex;
+    timelineIndex = 1;
+    selectTimeline.value = timelineIndex;
     await loadTimeline(currentOrigin);
   });
 
@@ -830,8 +846,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('tlOrigin');
     loadTimeline.dispose();
     initOrigin();
-    channelIndex = 1;
-    selectTimeline.value = channelIndex;
+    timelineIndex = 1;
+    selectTimeline.value = timelineIndex;
     await loadTimeline(currentOrigin);
   });
 
