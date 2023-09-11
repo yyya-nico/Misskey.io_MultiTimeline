@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const loadTimeline = async origin => {
-    await initEmojis(currentOrigin);
+    await initEmojis(origin);
     const stream = new misskeyStream(origin);
     const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
     const hTimeline = stream.useChannel(channelNames[1]);
