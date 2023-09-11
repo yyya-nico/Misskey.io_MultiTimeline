@@ -821,6 +821,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     loadTimeline.dispose();
     initOrigin();
+    channelIndex = 1;
+    selectTimeline.value = channelIndex;
     await loadTimeline(currentOrigin);
   });
 
