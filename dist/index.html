@@ -58,6 +58,15 @@
         <div class="misskey-link">
             <a href="https://misskey.io" target="misskey" rel=”noopener”><span class="host">misskey.io</span>を開く</a>
         </div>
+        <div class="select-timeline">
+            <label for="select-timeline"><span class="host">misskey.io</span>タイムライン選択</label>
+            <select id="select-timeline">
+                <option value="0" disabled>ホーム</option>
+                <option value="1">ローカル</option>
+                <option value="2" disabled>ソーシャル</option>
+                <option value="3">グローバル</option>
+            </select>
+        </div>
         <div class="custom-host">
             <label for="custom-host">サーバーを指定する</label><form class="field-wrap" name="custom-host"><input type="text" id="custom-host" placeholder="misskey.io" required><button id="set-host">指定</button></form>
         </div>

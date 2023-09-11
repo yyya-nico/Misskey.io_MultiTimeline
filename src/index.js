@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const configFrame = document.querySelector('.config');
   const selectDisplay = document.getElementById('select-display');
   const sdValue = document.getElementById('select-display-value');
+  const selectTimeline = document.getElementById('select-timeline');
   const misskeyLink = document.querySelector('.misskey-link');
   const mlLink = misskeyLink.querySelector('a');
   const hostTextWraps = document.querySelectorAll('.host');
@@ -45,6 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   mediaMG.listen();
   rnMediaMG.listen();
   let currentOrigin, host;
+  let channelIndex = 1;
+  selectTimeline.value = channelIndex;
   const originToHost = origin => origin.replace('https://', '');
 
   const initOrigin = () => {
@@ -102,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initEmojis(origin);
     const stream = new misskeyStream(origin);
     const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
-    const hTimeline = stream.useChannel(channelNames[1]);
+    const hTimeline = stream.useChannel(channelNames[channelIndex]);
     // const stream = new misskeyStream(origin, {token: ''});
     // const hTimeline = stream.useChannel('homeTimeline');
     const autoShowNew = {
@@ -803,17 +806,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  clearEmojisCacheBtn.addEventListener('click', async () => {
-    const oldEmojis = localStorage.getItem(`tlEmojis${host}`);
-    localStorage.removeItem(`tlEmojis${host}`);
-    await initEmojis(currentOrigin);
-    const newEmojis = localStorage.getItem(`tlEmojis${host}`);
-    if (oldEmojis === newEmojis) {
-      alert('絵文字URLを再取得しましたが、特に変更はないようです。しばらくたってからお試しください。');
-    } else {
-      alert('絵文字URLを再取得した結果、変更がありました。');
-    }
-  })
+  selectTimeline.addEventListener('change', async () => {
+    loadTimeline.dispose();
+    channelIndex = Number(selectTimeline.value);
+    await loadTimeline(currentOrigin);
+  });
   
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -831,6 +828,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('tlOrigin');
     loadTimeline.dispose();
     initOrigin();
+    channelIndex = 1;
+    selectTimeline.value = channelIndex;
     await loadTimeline(currentOrigin);
+  });
+
+  clearEmojisCacheBtn.addEventListener('click', async () => {
+    const oldEmojis = localStorage.getItem(`tlEmojis${host}`);
+    localStorage.removeItem(`tlEmojis${host}`);
+    await initEmojis(currentOrigin);
+    const newEmojis = localStorage.getItem(`tlEmojis${host}`);
+    if (oldEmojis === newEmojis) {
+      alert('絵文字URLを再取得しましたが、特に変更はないようです。しばらくたってからお試しください。');
+    } else {
+      alert('絵文字URLを再取得した結果、変更がありました。');
+    }
   });
 });
