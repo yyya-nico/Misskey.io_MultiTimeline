@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       await cli.request('emoji', {name: name})
         .then((data) => {
           emojiShortcodeToUrlDic[host][name] = data !== null ? data.url : null;
+          // console.log(`${host}\'s Emoji`, `:${name}:`, 'stored');
         }).catch((e) => {
           console.log(`${host}\'s Emoji`, `:${name}:`, 'not found');
           console.dir(e);
@@ -477,6 +478,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const host = note.user.host;
       if (host) {
         storeExternalEmojisFromNote(note);
+        // console.log(note);
       }
       if (isNoteOrQuote) {
         if (autoShowNew.note) {
@@ -494,6 +496,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const host = renote.user.host;
         if (host) {
           storeExternalEmojisFromNote(renote);
+          // console.log(renote);
         }
         if (autoShowNew.renote) {
           await renoteList.appendToTl(note);//RN
