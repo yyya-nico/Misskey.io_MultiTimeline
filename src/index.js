@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       //   console.log('external host emoji:', name);
       // }
       const targetHost = host || originToHost(origin);
-      return emojiShortcodeToUrlDic[targetHost][name];
+      return emojiShortcodeToUrlDic[targetHost][name] || null;
     }
     // console.log(emojiShortcodeToUrl('x_z'));
   
