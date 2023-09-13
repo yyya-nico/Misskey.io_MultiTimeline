@@ -126,22 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const controller = new AbortController();
     let wakeLock = null;
 
-    const loadAndStoreEmoji = async (name, host) => {
-      if (!(host in emojiShortcodeToUrlDic)) {
-        emojiShortcodeToUrlDic[host] = {};
-      }
-      const cli = new misskeyApi.APIClient({origin: `https://${host}`});
-      await cli.request('emoji', {name: name})
-        .then((data) => {
-          emojiShortcodeToUrlDic[host][name] = data !== null ? data.url : null;
-          // console.log(`${host}\'s Emoji`, `:${name}:`, 'stored');
-        }).catch((e) => {
-          console.log(`${host}\'s Emoji`, `:${name}:`, 'not found');
-          console.dir(e);
-          emojiShortcodeToUrlDic[host][name] = null;
-      });
-    }
-
     const storeExternalEmojisFromNote = note => {
       const host = note.user.host;
       if (!(host in emojiShortcodeToUrlDic)) {
@@ -161,9 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       //   console.log('external host emoji:', name);
       // }
       const targetHost = host || originToHost(origin);
-      if (!(targetHost in emojiShortcodeToUrlDic) || !(name in emojiShortcodeToUrlDic[targetHost])) {
-        await loadAndStoreEmoji(name, targetHost);
-      }
       return emojiShortcodeToUrlDic[targetHost][name];
     }
     // console.log(emojiShortcodeToUrl('x_z'));
