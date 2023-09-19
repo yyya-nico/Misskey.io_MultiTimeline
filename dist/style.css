@@ -580,7 +580,6 @@ button {
 .config.customized-host .reset-host {
   display: flex;
   justify-content: center;
-  margin-top: 25px;
 }
 .config .select-display {
   display: flex;
