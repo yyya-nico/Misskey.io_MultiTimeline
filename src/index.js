@@ -93,11 +93,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           localStorage.setItem(`tlEmojis${host}`, JSON.stringify(emojiShortcodeToUrlDic[host]));
         } else {
           console.log('error or no content', response.status);
-          emojiShortcodeToUrlDic[host] = {};
         }
       }).catch((e) => {
         console.error('Failed to load Emojis', e);
-        emojiShortcodeToUrlDic[host] = {};
       });
   }
 
@@ -128,9 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const storeExternalEmojisFromNote = note => {
       const host = note.user.host;
-      if (!(host in emojiShortcodeToUrlDic)) {
-        emojiShortcodeToUrlDic[host] = {};
-      }
+      emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
       [note.user.emojis, note.emojis].forEach(emojis => {
         Object.keys(emojis).forEach(name => {
           const url = emojis[name];
