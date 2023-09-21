@@ -119,7 +119,7 @@ button {
   border-radius: 5px;
   background-color: #333333;
   color: lightgray;
-  font-size: 1.2em;
+  font-size: 1em;
   font-family: inherit;
   cursor: pointer;
 }
@@ -620,12 +620,12 @@ button {
   height: 100%;
 }
 .config .custom-host .field-wrap #custom-host {
-  width: calc(100% - 65px);
+  width: calc(100% - 58px);
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .config .custom-host .field-wrap #set-host {
-  width: 65px;
+  width: 58px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
