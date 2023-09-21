@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
   }
 
-  let authInfo = checkToken(originToHost(origin));
+  let authInfo = checkToken(host);
   initAuth(authInfo);
   const loadTimeline = async origin => {
     await initEmojis(origin);
