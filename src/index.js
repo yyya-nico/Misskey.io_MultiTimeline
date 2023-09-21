@@ -839,7 +839,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (oldEmojis === newEmojis) {
       alert('絵文字URLを再取得しましたが、特に変更はないようです。しばらくたってからお試しください。');
     } else {
-      alert('絵文字URLを再取得した結果、変更がありました。');
+      const parsed = {
+        oldEmojis: JSON.parse(oldEmojis),
+        newEmojis: JSON.parse(newEmojis)
+      };
+      let diffEmojiNames = {
+        old: [],
+        new: []
+      };
+      for (const key in parsed.oldEmojis) {
+        if (Object.hasOwnProperty.call(parsed.oldEmojis, key)) {
+          if (!(key in parsed.newEmojis)) {
+            diffEmojiNames.old.push(key);
+          }
+        }
+      }
+      for (const key in parsed.newEmojis) {
+        if (Object.hasOwnProperty.call(parsed.newEmojis, key)) {
+          if (!(key in parsed.oldEmojis)) {
+            diffEmojiNames.new.push(key);
+          }
+        }
+      }
+      alert(
+`絵文字URLを再取得した結果、変更がありました。
+消去された絵文字:
+${diffEmojiNames.old.length ? `:${diffEmojiNames.old.join(':\n:')}:` : 'なし'}
+登録された絵文字:
+${diffEmojiNames.new.length ? `:${diffEmojiNames.new.join(':\n:')}:` : 'なし'}`
+      );
     }
   });
 });
