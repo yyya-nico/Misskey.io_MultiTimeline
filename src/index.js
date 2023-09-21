@@ -810,12 +810,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
+    loadTimeline.dispose();
     if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
+      if (currentOrigin !== ioOrigin) {
+        localStorage.removeItem(`tlEmojis${host}`);
+      }
     } else {
       localStorage.removeItem('tlOrigin');
     }
-    loadTimeline.dispose();
     initOrigin();
     timelineIndex = 1;
     selectTimeline.value = timelineIndex;
@@ -823,8 +826,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   resetHostBtn.addEventListener('click', async () => {
-    localStorage.removeItem('tlOrigin');
     loadTimeline.dispose();
+    localStorage.removeItem('tlOrigin');
+    localStorage.removeItem(`tlEmojis${host}`);
     initOrigin();
     timelineIndex = 1;
     selectTimeline.value = timelineIndex;
