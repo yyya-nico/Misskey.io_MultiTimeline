@@ -124,10 +124,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
   }
 
-  let authInfo;
+  let authInfo = checkToken(originToHost(origin));
+  initAuth(authInfo);
   const loadTimeline = async origin => {
-    authInfo = checkToken(originToHost(origin));
-    initAuth(authInfo);
     await initEmojis(origin);
     const stream = new misskeyStream(origin, authInfo ? {token: authInfo.token} : null);
     const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
@@ -848,6 +847,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem('tlOrigin');
     }
     initOrigin();
+    authInfo = checkToken(host);
+    initAuth(authInfo);
     await loadTimeline(currentOrigin);
   });
 
@@ -856,6 +857,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('tlOrigin');
     localStorage.removeItem(`tlEmojis${host}`);
     initOrigin();
+    authInfo = checkToken(host);
+    initAuth(authInfo);
     await loadTimeline(currentOrigin);
   });
 
@@ -867,6 +870,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       auths.splice(deleteIndex, 1);
       localStorage.setItem('auths', JSON.stringify(auths));
       loadTimeline.dispose();
+      authInfo = null;
+      initAuth(authInfo);
       await loadTimeline(currentOrigin);
     } else {
       goMiAuth(host);
