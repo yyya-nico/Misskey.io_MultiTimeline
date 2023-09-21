@@ -109,7 +109,6 @@ input[type=text]::placeholder {
 }
 
 select option:disabled {
-  display: none;
   color: #7f7f7f;
 }
 
@@ -631,6 +630,11 @@ button {
 }
 .config .reset-host {
   display: none;
+}
+.config .authenticate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .config .clear-emojis-cache {
   display: flex;

@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misskey.io マルチタイムライン</title>
+    <title>Misskey.io マルチタイムライン(連携対応版)</title>
     <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192x192.png">
     <link rel="manifest" href="manifest.json">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="stylesheet" href="style.css">
     <script src="main.js"></script>
-    <script type="text/javascript" src="/js/pwacompat.min.js" async></script>
+    <script type="text/javascript" src="//yyya-nico.co/js/pwacompat.min.js" async></script>
     <script>
         window.addEventListener('load', function () {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register("/js/serviceworker.js");
+                navigator.serviceWorker.register("serviceworker.js");
             }
         });
     </script>
@@ -72,6 +72,9 @@
         </div>
         <div class="reset-host">
             <button id="reset-host">サーバー指定を解除</button>
+        </div>
+        <div class="authenticate">
+            <label for="authenticate">認証してHTLとSTLも見る</label><button id="authenticate">認証</button>
         </div>
         <details>
             <summary>仮設の機能</summary>

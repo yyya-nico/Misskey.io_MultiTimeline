@@ -1,3 +1,5 @@
+import { api as misskeyApi } from 'misskey-js';
+
 const scrollToBottom = node => {
     node.scrollTo({top: node.scrollHeight});
 }
@@ -40,4 +42,55 @@ const fromNow = posted => {
     }
 }
 
-export {scrollToBottom, htmlspecialchars, fromNow}
+const goMiAuth = host => {
+  const sessionId = crypto.randomUUID();
+  const miAuthUrl = new URL(`https://${host}/miauth/${sessionId}`);
+  const miAuthParams = miAuthUrl.searchParams;
+  miAuthParams.append('name','マルチタイムライン');
+  const callbackUrl = new URL(`${location.origin}/callback`);
+  callbackUrl.searchParams.append('host', host);
+  miAuthParams.append('callback', callbackUrl.toString());
+  location.href = miAuthUrl.toString();
+}
+
+const saveToken = async () => {
+    const params = new URLSearchParams(location.search);
+    history.replaceState(null, null, '/');
+    const sessionId = params.get('session');
+    const host = params.get('host');
+    if (!sessionId || !host) {
+        return;        
+    }
+    const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+    await cli.request(`miauth/${sessionId}/check`, {})
+      .then(data => {
+        if (data.ok) {
+          const storedAuths = localStorage.getItem('auths');
+          const auths = storedAuths && JSON.parse(storedAuths) || [];
+          auths.push({
+            host: host,
+            token: data.token,
+            user: data.user
+          });
+          localStorage.setItem('auths', JSON.stringify(auths));
+        }
+      }).catch((e) => {
+        console.log(`${host}\'s miauth/{session}/check could not load`);
+        console.dir(e);
+    });
+}
+
+const routing = async () => {
+    switch (location.pathname) {
+        case '/':
+            break;
+        case '/callback':
+            await saveToken();
+            break;
+        default:
+            alert('指定のURLにはページがありません。');
+            history.replaceState(null, null, '/');
+    }
+}
+
+export {scrollToBottom, htmlspecialchars, fromNow, goMiAuth, routing}
