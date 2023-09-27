@@ -42,11 +42,95 @@ const fromNow = posted => {
     }
 }
 
+const getDeviceType = () => {
+    const ua = navigator.userAgent;
+    const is = reg => reg.test(ua);
+    const getOsName = () => {
+        if (is(/Android/)) {
+            return 'Android';
+        } else if (is(/Linux/)) {
+            return 'Linux';
+        } else if (is(/Mac OS X/) && !is(/iPhone OS|CPU OS/)) {
+            return 'macOS';
+        } else if (is(/Windows/)) {
+            return 'Windows';
+        } else if (is(/iPhone|iPod/)) {
+            return 'iOS';
+        } else if (is(/iPad/)) {
+            return 'iPadOS';
+        } else if (is(/CrOS/)) {
+            return 'ChromeOS';
+        } else {
+            return 'Unknown OS';
+        }
+    }
+    const os = getOsName();
+    const betweenText = (start, end) => new RegExp(`(${start})(.*?)(${end})`).exec(ua)[2];
+    const getOsVersion = () => {
+        switch (os) {
+            case 'Android':
+                return betweenText('Android ','[.;]');
+            case 'macOS':
+                return betweenText('Mac OS X ','[;)]').replace('_', '.');
+            case 'Windows':
+                const ntVersion = Number(betweenText('Windows NT ','[;)]'));
+                switch (ntVersion) {
+                    case 10.0:
+                        return '10(11)';
+                    case 6.3:
+                        return '8.1';
+                    case 6.2:
+                        return '8';
+                    case 6.1:
+                        return '7';
+                    case 6.0:
+                        return 'Vista';
+                
+                    default:
+                        if (ntVersion > 10.0) {
+                            return '新規のバージョン';
+                        } else if (ntVersion < 6.0) {
+                            return '以前のバージョン';
+                        } else {
+                            return '未知のバージョン';
+                        }
+                }
+            case 'iOS':
+            case 'iPadOS':
+                return betweenText('iPhone;? i?OS |CPU OS ',';? ').replace('_', '.');
+            case 'ChromeOS':
+                return betweenText('CrOS ',' ');
+
+            default:
+                return '';
+        }
+    }
+    const osVersion = getOsVersion();
+    const getBrowser = () => {
+        if (is(/Edge|Edg/)) {
+            return 'Edge';
+        } else if (is(/Firefox|FxiOS/)) {
+            return 'Firefox';
+        } else if (is(/Chrome|CriOS/)) {
+            return 'Chrome';
+        } else if (is(/iPhone|iPad|iPod|Mac/) && is(/Safari/)) {
+            return 'Safari';
+        } else if (is(/iPad/)) {
+            return 'iPadOS';
+        } else {
+            return 'Unknown Browser';
+        }
+    }
+    const browser = getBrowser();
+    return `${browser} on ${os} ${osVersion}`;
+}
+
 const goMiAuth = host => {
   const sessionId = crypto.randomUUID();
   const miAuthUrl = new URL(`https://${host}/miauth/${sessionId}`);
   const miAuthParams = miAuthUrl.searchParams;
-  miAuthParams.append('name','マルチタイムライン');
+  const deviceType = getDeviceType();
+  miAuthParams.append('name',`マルチタイムライン via ${deviceType}`);
   const callbackUrl = new URL(`${location.origin}/callback`);
   callbackUrl.searchParams.append('host', host);
   miAuthParams.append('callback', callbackUrl.toString());
