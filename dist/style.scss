@@ -719,6 +719,10 @@ button {
         display: none;
     }
 
+    .auth-compatible-link {
+        align-self: flex-end;
+    }
+
     .clear-emojis-cache {
         display: flex;
         justify-content: center;

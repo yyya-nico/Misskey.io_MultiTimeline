@@ -632,6 +632,9 @@ button {
 .config .reset-host {
   display: none;
 }
+.config .auth-compatible-link {
+  align-self: flex-end;
+}
 .config .clear-emojis-cache {
   display: flex;
   justify-content: center;
