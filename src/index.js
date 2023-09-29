@@ -124,6 +124,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const controller = new AbortController();
     let wakeLock = null;
 
+    const loadAndStoreEmoji = async (name, host) => {
+      emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
+      const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+      await cli.request('emoji', {name: name})
+        .then((data) => {
+          const isValid = data !== null && (host === originToHost(origin) || data.localOnly !== true);
+          emojiShortcodeToUrlDic[host][name] = isValid ? data.url : null;
+          // host !== originToHost(origin) && data.localOnly === true && console.log(`${host}\'s Emoji`, `:${name}:`, 'is local only');
+          // emojiShortcodeToUrlDic[host][name] && console.log(`${host}\'s Emoji`, `:${name}:`, 'stored');
+        }).catch((e) => {
+          console.log(`${host}\'s Emoji`, `:${name}:`, 'not found');
+          console.dir(e);
+          emojiShortcodeToUrlDic[host][name] = null;
+      });
+    }
+
     const storeExternalEmojisFromNote = note => {
       const host = note.user.host;
       emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
@@ -137,11 +153,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   
     const emojiShortcodeToUrl = async (name, host) => {
-      // if (host) {
+      // if (host === originToHost(origin)) {
       //   console.log('external host emoji:', name);
       // }
-      const targetHost = host || originToHost(origin);
-      return emojiShortcodeToUrlDic[targetHost][name] || null;
+      host = host || originToHost(origin);
+      if (!(host in emojiShortcodeToUrlDic) || !(name in emojiShortcodeToUrlDic[host])) {
+        await loadAndStoreEmoji(name, host);
+      }
+      return emojiShortcodeToUrlDic[host][name] || null;
     }
     // console.log(emojiShortcodeToUrl('x_z'));
   
@@ -514,7 +533,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const apiTimelineEndpoints = ['timeline','local-timeline','hybrid-timeline','global-timeline'];
-    const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+    const cli = new misskeyApi.APIClient({origin: origin});
     await cli.request(`notes/${apiTimelineEndpoints[timelineIndex]}`, {limit: 15})
       .then(async (notes) => {
         notes = notes.reverse();
