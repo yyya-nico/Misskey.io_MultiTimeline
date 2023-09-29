@@ -847,24 +847,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         oldEmojis: JSON.parse(oldEmojis),
         newEmojis: JSON.parse(newEmojis)
       };
-      let diffEmojiNames = {
-        old: [],
-        new: []
+      const oldEmojiNames = Object.keys(parsed.oldEmojis);
+      const newEmojiNames = Object.keys(parsed.newEmojis);
+      const diffEmojiNames = {
+        old: oldEmojiNames.filter(key => !(key in parsed.newEmojis)),
+        new: newEmojiNames.filter(key => !(key in parsed.oldEmojis))
       };
-      for (const key in parsed.oldEmojis) {
-        if (Object.hasOwnProperty.call(parsed.oldEmojis, key)) {
-          if (!(key in parsed.newEmojis)) {
-            diffEmojiNames.old.push(key);
-          }
-        }
-      }
-      for (const key in parsed.newEmojis) {
-        if (Object.hasOwnProperty.call(parsed.newEmojis, key)) {
-          if (!(key in parsed.oldEmojis)) {
-            diffEmojiNames.new.push(key);
-          }
-        }
-      }
       alert(
 `絵文字URLを再取得した結果、変更がありました。
 消去された絵文字(${diffEmojiNames.old.length}件):
