@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     stream.on('_disconnected_', () => {
       console.log('disconnected');
-      wakeLock.release()
+      wakeLock !== null && wakeLock.release()
       .then(() => {
         wakeLock = null;
       });
