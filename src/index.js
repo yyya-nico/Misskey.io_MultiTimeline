@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
   const keepEmojis = document.getElementById('keep-emojis');
-  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const authenticateLabel = document.querySelector('[for="authenticate"]');
   const authenticateBtn = document.getElementById('authenticate');
+  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const ioOrigin = 'https://misskey.io';
   const defaultHostText = hostTextWraps[0].textContent;
   const defaultTitle = document.title;
