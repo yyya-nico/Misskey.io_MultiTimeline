@@ -867,9 +867,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       alert(
 `絵文字URLを再取得した結果、変更がありました。
-消去された絵文字:
+消去された絵文字(${diffEmojiNames.old.length}件):
 ${diffEmojiNames.old.length ? `:${diffEmojiNames.old.join(':\n:')}:` : 'なし'}
-登録された絵文字:
+登録された絵文字(${diffEmojiNames.new.length}件):
 ${diffEmojiNames.new.length ? `:${diffEmojiNames.new.join(':\n:')}:` : 'なし'}`
       );
     }
