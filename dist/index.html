@@ -67,17 +67,19 @@
                 <option value="3">グローバル</option>
             </select>
         </div>
-        <div class="custom-host">
-            <label for="custom-host">サーバーを指定する</label><form class="field-wrap" name="custom-host"><input type="text" id="custom-host" placeholder="misskey.io" required><button id="set-host">指定</button></form>
-        </div>
-        <div class="reset-host">
+        <div class="config-host">
+            <label for="custom-host">サーバーを指定する</label>
+            <form class="field-wrap" name="custom-host"><input type="text" id="custom-host" placeholder="misskey.io" required><button id="set-host">指定</button></form>
             <button id="reset-host">サーバー指定を解除</button>
+            <div class="keep-emojis">
+                <input type="checkbox" id="keep-emojis"><label for="keep-emojis">サーバー指定/指定解除時<span class="host"></span>の絵文字を保持</label>
+            </div>
         </div>
         <div class="authenticate">
             <label for="authenticate">認証してHTLとSTLも見る</label><button id="authenticate">認証</button>
         </div>
         <details>
-            <summary>仮設の機能</summary>
+            <summary>非推奨(意味がありません)</summary>
             <div class="clear-emojis-cache">
                 <button id="clear-emojis-cache"><span class="host">misskey.io</span>の全絵文字のURLを再取得</button>
             </div>

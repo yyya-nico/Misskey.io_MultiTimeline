@@ -25,10 +25,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const misskeyLink = document.querySelector('.misskey-link');
   const mlLink = misskeyLink.querySelector('a');
   const hostTextWraps = document.querySelectorAll('.host');
-  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const customHostForm = document.forms['custom-host'];
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
+  const keepEmojis = document.getElementById('keep-emojis');
+  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const authenticateLabel = document.querySelector('[for="authenticate"]');
   const authenticateBtn = document.getElementById('authenticate');
   const ioOrigin = 'https://misskey.io';
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       configFrame.classList.remove('customized-host');
     }
     mlLink.href = currentOrigin;
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   }
   initOrigin();
 
@@ -151,6 +153,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const controller = new AbortController();
     let wakeLock = null;
 
+    const loadAndStoreEmoji = async (name, host) => {
+      emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
+      const cli = new misskeyApi.APIClient({origin: `https://${host}`});
+      await cli.request('emoji', {name: name})
+        .then((data) => {
+          const isValid = data !== null && (host === originToHost(origin) || data.localOnly !== true);
+          emojiShortcodeToUrlDic[host][name] = isValid ? data.url : null;
+          // host !== originToHost(origin) && data.localOnly === true && console.log(`${host}\'s Emoji`, `:${name}:`, 'is local only');
+          // emojiShortcodeToUrlDic[host][name] && console.log(`${host}\'s Emoji`, `:${name}:`, 'stored');
+        }).catch((e) => {
+          console.log(`${host}\'s Emoji`, `:${name}:`, 'not found');
+          console.dir(e);
+          emojiShortcodeToUrlDic[host][name] = null;
+      });
+    }
+
     const storeExternalEmojisFromNote = note => {
       const host = note.user.host;
       emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
@@ -164,11 +182,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   
     const emojiShortcodeToUrl = async (name, host) => {
-      // if (host) {
+      // if (host === originToHost(origin)) {
       //   console.log('external host emoji:', name);
       // }
-      const targetHost = host || originToHost(origin);
-      return emojiShortcodeToUrlDic[targetHost][name] || null;
+      host = host || originToHost(origin);
+      if (!(host in emojiShortcodeToUrlDic) || !(name in emojiShortcodeToUrlDic[host])) {
+        await loadAndStoreEmoji(name, host);
+      }
+      return emojiShortcodeToUrlDic[host][name] || null;
     }
     // console.log(emojiShortcodeToUrl('x_z'));
   
@@ -463,7 +484,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     stream.on('_disconnected_', () => {
       console.log('disconnected');
-      wakeLock.release()
+      wakeLock !== null && wakeLock.release()
       .then(() => {
         wakeLock = null;
       });
@@ -541,7 +562,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const apiTimelineEndpoints = ['timeline','local-timeline','hybrid-timeline','global-timeline'];
-    const cli = new misskeyApi.APIClient({origin: `https://${host}`, ...(authInfo && {credential: authInfo.token})});
+    const cli = new misskeyApi.APIClient({origin: origin, ...(authInfo && {credential: authInfo.token})});
     await cli.request(`notes/${apiTimelineEndpoints[timelineIndex]}`, {limit: 15})
       .then(async (notes) => {
         notes = notes.reverse();
@@ -841,7 +862,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
       if (currentOrigin !== ioOrigin) {
-        localStorage.removeItem(`tlEmojis${host}`);
+        if (!keepEmojis.checked) {
+          localStorage.removeItem(`tlEmojis${host}`);
+        }
       }
     } else {
       localStorage.removeItem('tlOrigin');
@@ -849,16 +872,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     initOrigin();
     authInfo = checkToken(host);
     initAuth(authInfo);
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
   });
 
   resetHostBtn.addEventListener('click', async () => {
     loadTimeline.dispose();
     localStorage.removeItem('tlOrigin');
-    localStorage.removeItem(`tlEmojis${host}`);
+    if (!keepEmojis.checked) {
+      localStorage.removeItem(`tlEmojis${host}`);
+    }
     initOrigin();
     authInfo = checkToken(host);
     initAuth(authInfo);
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
   });
 
