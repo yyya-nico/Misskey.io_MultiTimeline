@@ -67,11 +67,13 @@
                 <option value="3">グローバル</option>
             </select>
         </div>
-        <div class="custom-host">
-            <label for="custom-host">サーバーを指定する</label><form class="field-wrap" name="custom-host"><input type="text" id="custom-host" placeholder="misskey.io" required><button id="set-host">指定</button></form>
-        </div>
-        <div class="reset-host">
+        <div class="config-host">
+            <label for="custom-host">サーバーを指定する</label>
+            <form class="field-wrap" name="custom-host"><input type="text" id="custom-host" placeholder="misskey.io" required><button id="set-host">指定</button></form>
             <button id="reset-host">サーバー指定を解除</button>
+            <div class="keep-emojis">
+                <input type="checkbox" id="keep-emojis"><label for="keep-emojis">サーバー指定/指定解除時<span class="host"></span>の絵文字を保持</label>
+            </div>
         </div>
         <div class="auth-compatible-link">
             <a href="//misskeytimeline.yyya-nico.co">連携対応版に移動</a>

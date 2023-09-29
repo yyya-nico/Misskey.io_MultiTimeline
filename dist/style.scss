@@ -650,9 +650,18 @@ button {
     transition: ease .4s;
 
     &.customized-host {
-        .reset-host {
-            display: flex;
-            justify-content: center;
+        .config-host {
+            #reset-host {
+                display: inline-block;
+                align-self: center;
+            }
+        
+            .keep-emojis {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                font-size: 0.8em;
+            }
         }
     }
 
@@ -688,11 +697,10 @@ button {
         align-self: flex-end;
     }
 
-    .custom-host {
+    .config-host {
         display: flex;
         flex-direction: column;
         gap: 12.5px;
-
         .field-wrap {
             display: flex;
             height: 38px;
@@ -713,10 +721,11 @@ button {
                 border-bottom-left-radius: 0;
             }
         }
-    }
-
-    .reset-host {
-        display: none;
+    
+        #reset-host,
+        .keep-emojis {
+            display: none;
+        }
     }
 
     .auth-compatible-link {

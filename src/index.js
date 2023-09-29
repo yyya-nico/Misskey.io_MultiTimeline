@@ -24,10 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const misskeyLink = document.querySelector('.misskey-link');
   const mlLink = misskeyLink.querySelector('a');
   const hostTextWraps = document.querySelectorAll('.host');
-  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const customHostForm = document.forms['custom-host'];
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
+  const keepEmojis = document.getElementById('keep-emojis');
+  const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const ioOrigin = 'https://misskey.io';
   const defaultHostText = hostTextWraps[0].textContent;
   const defaultTitle = document.title;
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       configFrame.classList.remove('customized-host');
     }
     mlLink.href = currentOrigin;
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   }
   initOrigin();
 
@@ -833,7 +835,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
       if (currentOrigin !== ioOrigin) {
-        localStorage.removeItem(`tlEmojis${host}`);
+        if (!keepEmojis.checked) {
+          localStorage.removeItem(`tlEmojis${host}`);
+        }
       }
     } else {
       localStorage.removeItem('tlOrigin');
@@ -841,16 +845,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     initOrigin();
     timelineIndex = 1;
     selectTimeline.value = timelineIndex;
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
   });
 
   resetHostBtn.addEventListener('click', async () => {
     loadTimeline.dispose();
     localStorage.removeItem('tlOrigin');
-    localStorage.removeItem(`tlEmojis${host}`);
+    if (!keepEmojis.checked) {
+      localStorage.removeItem(`tlEmojis${host}`);
+    }
     initOrigin();
     timelineIndex = 1;
     selectTimeline.value = timelineIndex;
+    keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
   });
 

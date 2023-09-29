@@ -577,9 +577,15 @@ button {
   background-color: rgba(0, 0, 0, 0.4980392157);
   transition: ease 0.4s;
 }
-.config.customized-host .reset-host {
+.config.customized-host .config-host #reset-host {
+  display: inline-block;
+  align-self: center;
+}
+.config.customized-host .config-host .keep-emojis {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8em;
 }
 .config .select-display {
   display: flex;
@@ -607,29 +613,30 @@ button {
 .config .misskey-link {
   align-self: flex-end;
 }
-.config .custom-host {
+.config .config-host {
   display: flex;
   flex-direction: column;
   gap: 12.5px;
 }
-.config .custom-host .field-wrap {
+.config .config-host .field-wrap {
   display: flex;
   height: 38px;
 }
-.config .custom-host .field-wrap > * {
+.config .config-host .field-wrap > * {
   height: 100%;
 }
-.config .custom-host .field-wrap #custom-host {
+.config .config-host .field-wrap #custom-host {
   width: calc(100% - 58px);
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
-.config .custom-host .field-wrap #set-host {
+.config .config-host .field-wrap #set-host {
   width: 58px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-.config .reset-host {
+.config .config-host #reset-host,
+.config .config-host .keep-emojis {
   display: none;
 }
 .config .auth-compatible-link {
