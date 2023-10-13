@@ -356,6 +356,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, {once: true, signal: controller.signal});
     }, {signal: controller.signal});
   
+    const beforeAutoShowNew = {
+      note: false,
+      renote: false,
+      medium: false,
+      rnMedium: false
+    }
     const textToggleHandler = e => {
       if (selecting) {
         selecting = false;
@@ -363,6 +369,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       if (e.target.closest('.is-long') || e.target.closest('.wrap') && e.target.querySelector('.is-long')) {
         e.target.closest('.wrap').classList.toggle('is-open');
+        if (e.target.closest('.wrap').classList.contains('is-open')) {
+          if (e.currentTarget === noteList) {
+            beforeAutoShowNew.note = autoShowNew.note;
+            autoShowNew.note = false;
+            notelatestBtn.classList.add('show');
+          } else if (e.currentTarget === renoteList) {
+            beforeAutoShowNew.renote = autoShowNew.renote;
+            autoShowNew.renote = false;
+            renotelatestBtn.classList.add('show');
+          }
+        } else {
+          if (e.currentTarget === noteList) {
+            if (beforeAutoShowNew.note) {
+              notelatestBtn.click();
+            }
+          } else if (e.currentTarget === renoteList) {
+            if (beforeAutoShowNew.renote) {
+              renotelatestBtn.click();
+            }
+          }
+        }
       }
     }
   
@@ -380,6 +407,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           mediaMG.positionItems();
         } else if (e.currentTarget === rnMediaList) {
           rnMediaMG.positionItems();
+        }
+        if (e.target.closest('.is-long').classList.contains('is-open')) {
+          if (e.currentTarget === mediaList) {
+            beforeAutoShowNew.medium = autoShowNew.medium;
+            autoShowNew.medium = false;
+            mediumlatestBtn.classList.add('show');
+          } else if (e.currentTarget === rnMediaList) {
+            beforeAutoShowNew.rnMedium = autoShowNew.rnMedium;
+            autoShowNew.rnMedium = false;
+            rnMediumlatestBtn.classList.add('show');
+          }
+        } else {
+          if (e.currentTarget === mediaList) {
+            if (beforeAutoShowNew.medium) {
+              mediumlatestBtn.click();
+            }
+          } else if (e.currentTarget === rnMediaList) {
+            if (beforeAutoShowNew.rnMedium) {
+              rnMediumlatestBtn.click();
+            }
+          }
         }
       }
     }
@@ -593,6 +641,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         autoShowNew.rnMedium = true;
         await rnMediaList.appendToTl(stored.rnMedia);//RNMedia
       }
+      latestBtn.classList.remove('show');
       latestBtn.textContent = '新しいノートを見る';
     }
   
