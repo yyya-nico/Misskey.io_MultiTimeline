@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
             break;
           case 'text':
-            html += node.props.text.replace(/\n/g, '<br>');
+            html += node.props.text.replaceAll(/\n/g, '<br>');
             break;
           case 'unicodeEmoji':
             html += node.props.emoji;
