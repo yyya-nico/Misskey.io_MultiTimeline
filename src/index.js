@@ -79,10 +79,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const emojiShortcodeToUrlDic = {};
   const initEmojis = async origin => {
     const host = originToHost(origin);
-    if (localStorage.getItem(`tlEmojis${host}`)) {
+    const moreThan24HoursHavePassed = Date.now() - Number(localStorage.getItem(`tlEmojis${host}Loaded`)) >= 24 * 60 * 60 * 1000;
+    if (localStorage.getItem(`tlEmojis${host}`) && localStorage.getItem(`tlEmojis${host}Loaded`) && !moreThan24HoursHavePassed) {
       emojiShortcodeToUrlDic[host] = JSON.parse(localStorage.getItem(`tlEmojis${host}`));
+      console.log('Loaded emojis from cache');
       return;
     }
+
+    // emojis fetch
     emojiShortcodeToUrlDic[host] = {};
     await fetch(`${origin}/api/emojis`)
       .then(async (response) => {
@@ -93,12 +97,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             emojiShortcodeToUrlDic[host][entry.name] = entry.url;
           });
           localStorage.setItem(`tlEmojis${host}`, JSON.stringify(emojiShortcodeToUrlDic[host]));
+          localStorage.setItem(`tlEmojis${host}Loaded`, Date.now());
         } else {
           console.log('error or no content', response.status);
         }
       }).catch((e) => {
         console.error('Failed to load Emojis', e);
-      });
+    });
   }
 
   const loadTimeline = async origin => {
@@ -886,6 +891,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (currentOrigin !== ioOrigin) {
         if (!keepEmojis.checked) {
           localStorage.removeItem(`tlEmojis${host}`);
+          localStorage.removeItem(`tlEmojis${host}Loaded`);
         }
       }
     } else {
@@ -903,6 +909,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('tlOrigin');
     if (!keepEmojis.checked) {
       localStorage.removeItem(`tlEmojis${host}`);
+      localStorage.removeItem(`tlEmojis${host}Loaded`);
     }
     initOrigin();
     timelineIndex = 1;
@@ -917,7 +924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initEmojis(currentOrigin);
     const newEmojis = localStorage.getItem(`tlEmojis${host}`);
     if (oldEmojis === newEmojis) {
-      alert('絵文字URLを再取得しましたが、特に変更はないようです。しばらくたってからお試しください。');
+      alert('絵文字URLを再取得しましたが、変更はありませんでした。');
     } else {
       const parsed = {
         oldEmojis: JSON.parse(oldEmojis),
