@@ -9,7 +9,7 @@ const htmlspecialchars = unsafeText => {
         return unsafeText;
     }
     return unsafeText.replace(
-        /[&'`"<>]/g, 
+        /[&'`"<>]/g,
         match => {
         return {
             '&': '&amp;',
@@ -85,7 +85,7 @@ const getDeviceType = () => {
                         return '7';
                     case 6.0:
                         return 'Vista';
-                
+
                     default:
                         if (ntVersion > 10.0) {
                             return '新規のバージョン';
@@ -134,6 +134,7 @@ const goMiAuth = host => {
   const callbackUrl = new URL(`${location.origin}/callback`);
   callbackUrl.searchParams.append('host', host);
   miAuthParams.append('callback', callbackUrl.toString());
+  miAuthParams.append('permission', 'read:account');
   location.href = miAuthUrl.toString();
 }
 
@@ -143,7 +144,7 @@ const saveToken = async () => {
     const sessionId = params.get('session');
     const host = params.get('host');
     if (!sessionId || !host) {
-        return;        
+        return;
     }
     const cli = new misskeyApi.APIClient({origin: `https://${host}`});
     await cli.request(`miauth/${sessionId}/check`, {})
