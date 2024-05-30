@@ -5,18 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misskey.io マルチタイムライン(連携対応版)</title>
     <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192x192.png">
-    <link rel="manifest" href="manifest.json">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="stylesheet" href="style.css">
-    <script src="main.js"></script>
-    <script type="text/javascript" src="//yyya-nico.co/js/pwacompat.min.js" async></script>
-    <script>
-        window.addEventListener('load', function () {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register("serviceworker.js");
-            }
-        });
-    </script>
+    <script type="module" src="main.js"></script>
 </head>
 <body>
     <div class="grid">

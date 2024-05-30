@@ -1,11 +1,21 @@
 {
+  "name": "misskey-io-multitimeline",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "devDependencies": {
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "sass": "^1.77.3",
+    "vite": "^5.2.0",
+    "vite-plugin-pwa": "^0.20.0"
   },
   "dependencies": {
     "magic-grid": "github:yyya-nico/Magic-Grid",
-    "mfm-js": "^0.23.3",
-    "misskey-js": "^0.0.16"
+    "mfm-js": "^0.24.0",
+    "misskey-js": "^2024.3.1"
   }
 }
