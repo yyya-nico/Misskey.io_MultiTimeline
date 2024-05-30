@@ -1,3 +1,4 @@
+import './style.scss'
 import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
 import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       // console.log(`現在の${host}の絵文字記録:`, emojiShortcodeToUrlDic[host]);
     }
-  
+
     const emojiShortcodeToUrl = async (name, host) => {
       // if (host === originToHost(origin)) {
       //   console.log('external host emoji:', name);
@@ -170,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return emojiShortcodeToUrlDic[host][name] || null;
     }
     // console.log(emojiShortcodeToUrl('x_z'));
-  
+
     const simpleMfmToHTML = async (text, host) => {
       if (!text) {
         return '';
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // console.log(simpleMfmToHTML(''));
     // console.log(simpleMfmToHTML(null));
     // console.log(simpleMfmToHTML());
-  
+
     const makeTextHTMLFromNote = async (note, host) => {
       if (note.cw !== null) {
         return `[CW]${await simpleMfmToHTML(htmlspecialchars(note.cw), host)} <span class="cwtext">${(await simpleMfmToHTML(htmlspecialchars(note.text), host))}</span>`;
@@ -212,11 +213,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return '<span class="nothing">なにもありません</span>';
       }
     }
-  
+
     const detectSensitiveFile = note => {
       return note.files.some(file => file.isSensitive);
     }
-  
+
     const makeHTMLFromNote = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       note.host = note.user.host;
@@ -226,18 +227,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         name:      note.user.name ? await simpleMfmToHTML(note.user.name, note.host) : note.user.username,
         plainName: note.user.name ? note.user.name : note.user.username,
         text:      await makeTextHTMLFromNote(note, note.host),
-        fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '', 
+        fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '',
         time:      new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}),
         containsSensitive: (detectSensitiveFile(note) || renote && detectSensitiveFile(renote)) ? 'contains-sensitive' : '',
         ...(target === 'renote' && {
           rnName:      renote.user.name ? await simpleMfmToHTML(renote.user.name, renote.host) : renote.user.username,
           plainRnName: renote.user.name ? renote.user.name : renote.user.username,
           rnText:      await makeTextHTMLFromNote(renote, renote.host),
-          rnFileCount: renote.fileIds.length ? `<span class="file-count">[${renote.fileIds.length}つのファイル]</span>` : '', 
+          rnFileCount: renote.fileIds.length ? `<span class="file-count">[${renote.fileIds.length}つのファイル]</span>` : '',
           rnTime: fromNow(new Date(renote.createdAt))
         })
       };
-      const html = target === 'note' ? 
+      const html = target === 'note' ?
       `<li data-id="${note.id}" class="${formatted.containsSensitive}">
         <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${origin}/notes/${note.id}" class="time" target="misskey" rel=”noopener”>${formatted.time}</a>
       </li>
@@ -255,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       : false;
       return html;
     };
-  
+
     const makeHTMLFromNoteForMedia = async (note, target) => {
       note.isRenote = Boolean(note.renoteId);
       note.host = note.user.host;
@@ -291,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>`}
       </li>
       `
-      : 
+      :
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
         <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
           <span class="file-type">その他:${firstFile.type}</span>
@@ -304,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
       return html;
     };
-  
+
     const overflowJudgment = () => {
       const textWraps = document.querySelectorAll('li .wrap');
       textWraps.forEach(wrap => {
@@ -324,16 +325,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
     }
-  
+
     window.addEventListener('resize', overflowJudgment, {signal: controller.signal});
-  
+
     let selecting = false;
     document.addEventListener('selectstart', () => {
       document.addEventListener('pointerup', () => {
         selecting = !window.getSelection().isCollapsed;
       }, {once: true, signal: controller.signal});
     }, {signal: controller.signal});
-  
+
     const beforeAutoShowNew = {
       note: false,
       renote: false,
@@ -370,10 +371,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     }
-  
+
     noteList.addEventListener('click', textToggleHandler, {signal: controller.signal});
     renoteList.addEventListener('click', textToggleHandler, {signal: controller.signal});
-  
+
     const mediaTextToggleHandler = e => {
       if (selecting) {
         selecting = false;
@@ -409,10 +410,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     }
-  
+
     mediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
     rnMediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
-  
+
     Node.prototype.appendToTl = async function(noteOrNotes) {
       if (this !== noteList && this !== renoteList && this !== mediaList && this !== rnMediaList) {
         return false;
@@ -500,14 +501,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       overflowJudgment();
     }
-  
+
     stream.on('_connected_', async () => {
       console.log('connected');
       if (document.visibilityState === 'visible') {
         wakeLock = await navigator.wakeLock.request('screen');
       }
     });
-  
+
     stream.on('_disconnected_', () => {
       console.log('disconnected');
       wakeLock !== null && wakeLock.release()
@@ -515,7 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         wakeLock = null;
       });
     });
-  
+
     document.addEventListener('visibilitychange', async () => {
       if (wakeLock !== null && document.visibilityState === 'visible' && stream.state == 'connected') {
         wakeLock = await navigator.wakeLock.request('screen');
@@ -602,7 +603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // console.log(noteList.children.length + renoteList.children.length);
 
     hTimeline.on('note', parseNote);
-  
+
     const latestBtnHandler = async e => {
       const latestBtn = e.target;
       latestBtn.textContent = '読み込み中...';
@@ -622,12 +623,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       latestBtn.classList.remove('show');
       latestBtn.textContent = '新しいノートを見る';
     }
-  
+
     notelatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
     renotelatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
     mediumlatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
     rnMediumlatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
-  
+
     containers.forEach(container => {
       container.addEventListener('scroll', async e => {
         const latestBtn = container.querySelector('button[id$="-latest"]');
@@ -671,12 +672,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }, {signal: controller.signal});
     });
-  
+
     const confirmSensitive = () => {
       const confirmSensitive = document.querySelector('.confirm-sensitive');
       const buttons = document.getElementsByName('confirm-sensitive');
       let runResolve;
-  
+
       confirmSensitive.classList.add('show');
       [...buttons].forEach(button => {
         button.addEventListener('click', e => {
@@ -692,7 +693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         runResolve = resolve;
       });
     }
-  
+
     let asked = false;
     if (localStorage.getItem('tlDisplay')) {
       const tlDisplay = localStorage.getItem('tlDisplay');
@@ -700,7 +701,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const passed = await confirmSensitive();
         selectDisplay.value = passed ? tlDisplay : tlDisplay - 1;
         if (passed) {
-          asked = true;        
+          asked = true;
         }
       } else {
         selectDisplay.value = tlDisplay;
@@ -744,10 +745,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         rnMediaMG.positionItems();
       }
     }, {signal: controller.signal});
-  
+
     document.addEventListener('keydown', (event) => {
       const keyName = event.key;
-  
+
       if (keyName === 'Escape') {
         hTimeline.dispose();
         wakeLock !== null && wakeLock.release()
@@ -882,7 +883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     timelineIndex = Number(selectTimeline.value);
     await loadTimeline(currentOrigin);
   });
-  
+
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
     loadTimeline.dispose();
