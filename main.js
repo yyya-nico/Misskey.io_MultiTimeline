@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
       `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
         <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel=”noopener”>
-          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" ${firstFile.type.includes('image') ? `style="aspect-ratio: ${firstFile.properties.width} / ${firstFile.properties.height}"` : ''}>
+          <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" ${firstFile.type.includes('image') ? `width="${firstFile.properties.width}" height="${firstFile.properties.height}"` : ''}>
           ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
           ${formatted.fileCount}
         </a>${formatted.text &&`
@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // console.timeEnd(this.id);
         const videoThumbnailImgs = appendedItems
           .map(elem => elem.querySelector('img'))
-          .filter(img => img && img.style.aspectRatio === '' && img.src !== '');
+          .filter(img => img && img.style.width === '' && img.src !== '');
         videoThumbnailImgs.forEach(img => {
           img.addEventListener('load', () => {
             if (this === mediaList) {
