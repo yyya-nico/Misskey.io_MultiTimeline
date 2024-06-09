@@ -295,8 +295,8 @@ button {
                     >.name,
                     >.text {
                         .custom-emoji {
-                            height: 1.48em;
-                            vertical-align: -0.3em;
+                            height: 1.5em;
+                            vertical-align: -21%;
                         }
 
                         >.file-count {
@@ -655,7 +655,7 @@ button {
                 display: inline-block;
                 align-self: center;
             }
-        
+
             .keep-emojis {
                 display: flex;
                 align-items: center;
@@ -721,7 +721,7 @@ button {
                 border-bottom-left-radius: 0;
             }
         }
-    
+
         #reset-host,
         .keep-emojis {
             display: none;
