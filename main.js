@@ -679,6 +679,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let runResolve;
 
       confirmSensitive.classList.add('show');
+      buttons[0].focus();
       [...buttons].forEach(button => {
         button.addEventListener('click', e => {
           if (e.target.value === 'yes') {
