@@ -1,7 +1,7 @@
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default {
-    base: '/misskey.io_multi_tl/',
+    base: '/misskey.io-multi-tl/',
     plugins: [
       VitePWA({
         registerType: 'autoUpdate',
