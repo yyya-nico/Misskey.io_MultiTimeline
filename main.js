@@ -915,6 +915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
     loadTimeline.dispose();
+    customHost.value = customHost.value.replace(/https:\/\/(.+)\//g,'$1');
     if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
       if (currentOrigin !== ioOrigin) {
