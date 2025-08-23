@@ -21,6 +21,10 @@ const htmlspecialchars = unsafeText => {
     );
 }
 
+const nl2br = (text) => {
+    return text.replace(/\n/g, "<br>");
+};
+
 const fromNow = posted => {
     const diff = new Date().getTime() - posted.getTime();
     const progress = new Date(diff);
@@ -40,4 +44,4 @@ const fromNow = posted => {
     }
 }
 
-export {scrollToBottom, htmlspecialchars, fromNow}
+export {scrollToBottom, htmlspecialchars, nl2br, fromNow}

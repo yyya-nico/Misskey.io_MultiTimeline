@@ -2,7 +2,7 @@ import './style.scss'
 import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
 import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
-import {scrollToBottom, htmlspecialchars, fromNow} from './utils';
+import {scrollToBottom, htmlspecialchars, nl2br, fromNow} from './utils';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.querySelector('.grid');
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
             break;
           case 'text':
-            html += node.props.text.replaceAll(/\n/g, '<br>');
+            html += nl2br(node.props.text);
             break;
           case 'unicodeEmoji':
             html += node.props.emoji;
