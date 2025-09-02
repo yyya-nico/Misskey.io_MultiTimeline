@@ -108,7 +108,6 @@ input[type="text"] {
 
 select option {
     &:disabled {
-        display: none;
         color: #7f7f7f;
     }
 }
@@ -728,8 +727,10 @@ button {
         }
     }
 
-    .auth-compatible-link {
-        align-self: flex-end;
+    .authenticate {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .clear-emojis-cache {

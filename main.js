@@ -2,9 +2,10 @@ import './style.scss'
 import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
 import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
-import {scrollToBottom, htmlspecialchars, nl2br, fromNow} from './utils';
+import {scrollToBottom, htmlspecialchars, nl2br, fromNow, goMiAuth, routing} from './utils';
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await routing();
   const grid = document.querySelector('.grid');
   const containers = document.querySelectorAll('.container');
   const mediaContainers = [...containers].filter(container => ['media','rn-media'].some(className => container.classList.contains(className)));
@@ -29,6 +30,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const customHost = document.getElementById('custom-host');
   const resetHostBtn = document.getElementById('reset-host');
   const keepEmojis = document.getElementById('keep-emojis');
+  const authenticateLabel = document.querySelector('[for="authenticate"]');
+  const authenticateBtn = document.getElementById('authenticate');
   const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
   const ioOrigin = 'https://misskey.io';
   const defaultHostText = hostTextWraps[0].textContent;
@@ -48,15 +51,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   mediaMG.listen();
   rnMediaMG.listen();
   let currentOrigin, host;
-  let timelineIndex = 1;
-  selectTimeline.value = timelineIndex;
   const originToHost = origin => origin.replace('https://', '');
 
   const initOrigin = () => {
     if (localStorage.getItem('tlOrigin')) {
       currentOrigin = localStorage.getItem('tlOrigin');
       host = originToHost(currentOrigin);
-      document.title = `${host} マルチタイムライン`
+      document.title = `${host} マルチタイムライン(連携対応版)`
       hostTextWraps.forEach(hostTextWrap => {
         hostTextWrap.textContent = host;
       });
@@ -76,6 +77,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   }
   initOrigin();
+
+  const checkToken = host => {
+    const storedAuths = localStorage.getItem('auths');
+    const auths = storedAuths && JSON.parse(storedAuths) || [];
+    return auths.find(entry => entry.host === host) || null;
+  }
+
+  let timelineIndex;
+  const initAuth = authInfo => {
+    if (authInfo) {
+      const disabledOptions = selectTimeline.querySelectorAll(':disabled');
+      disabledOptions.forEach(option => option.disabled = false);
+      timelineIndex = 0;
+      authenticateLabel.textContent = `@${authInfo.user.username}に接続`;
+      authenticateBtn.textContent = '切断';
+    } else {
+      const disabledOptions = selectTimeline.querySelectorAll('[value="0"], [value="2"]');
+      disabledOptions.forEach(option => option.disabled = true);
+      timelineIndex = 1;
+      authenticateLabel.textContent = '認証してHTLとSTLも見る';
+      authenticateBtn.textContent = '認証';
+    }
+    selectTimeline.value = timelineIndex;
+  }
 
   const emojiShortcodeToUrlDic = {};
   const initEmojis = async origin => {
@@ -107,9 +132,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  let authInfo = checkToken(host);
+  initAuth(authInfo);
   const loadTimeline = async origin => {
     await initEmojis(origin);
-    const stream = new misskeyStream(origin);
+    const stream = new misskeyStream(origin, authInfo ? {token: authInfo.token} : null);
     const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
     const hTimeline = stream.useChannel(channelNames[timelineIndex]);
     // const stream = new misskeyStream(origin, {token: ''});
@@ -589,7 +616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const apiTimelineEndpoints = ['timeline','local-timeline','hybrid-timeline','global-timeline'];
-    const cli = new misskeyApi.APIClient({origin: origin});
+    const cli = new misskeyApi.APIClient({origin: origin, ...(authInfo && {credential: authInfo.token})});
     await cli.request(`notes/${apiTimelineEndpoints[timelineIndex]}`, {limit: 15})
       .then(async (notes) => {
         notes = notes.reverse();
@@ -888,6 +915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   customHostForm.addEventListener('submit', async e => {
     e.preventDefault();
     loadTimeline.dispose();
+    customHost.value = customHost.value.replace(/https:\/\/(.+)\//g,'$1');
     if (customHost.value !== originToHost(ioOrigin)) {
       localStorage.setItem('tlOrigin', `https://${customHost.value}`);
       if (currentOrigin !== ioOrigin) {
@@ -900,8 +928,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem('tlOrigin');
     }
     initOrigin();
-    timelineIndex = 1;
-    selectTimeline.value = timelineIndex;
+    authInfo = checkToken(host);
+    initAuth(authInfo);
     keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
   });
@@ -914,10 +942,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem(`tlEmojis${host}Loaded`);
     }
     initOrigin();
-    timelineIndex = 1;
-    selectTimeline.value = timelineIndex;
+    authInfo = checkToken(host);
+    initAuth(authInfo);
     keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
     await loadTimeline(currentOrigin);
+  });
+
+  authenticateBtn.addEventListener('click', async () => {
+    if (authInfo) {
+      const storedAuths = localStorage.getItem('auths');
+      const auths = storedAuths && JSON.parse(storedAuths) || [];
+      const deleteIndex = auths.findIndex(entry => entry.host === host);
+      auths.splice(deleteIndex, 1);
+      localStorage.setItem('auths', JSON.stringify(auths));
+      loadTimeline.dispose();
+      authInfo = null;
+      initAuth(authInfo);
+      await loadTimeline(currentOrigin);
+    } else {
+      goMiAuth(host);
+    }
   });
 
   clearEmojisCacheBtn.addEventListener('click', async () => {

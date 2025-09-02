@@ -1,7 +1,7 @@
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default {
-    base: '/misskey.io-multi-tl/',
+    base: '/',
     plugins: [
       VitePWA({
         registerType: 'autoUpdate',
@@ -10,7 +10,7 @@ export default {
             "theme_color": "#101010",
             "background_color": "#1f1f1f",
             "display": "standalone",
-            "start_url": "/misskey.io_multi_tl/",
+            "start_url": "/",
             "name": "Misskey.io マルチタイムライン",
             "short_name": "マルチTL",
             "description": "見やすいタイムラインを目指しました",

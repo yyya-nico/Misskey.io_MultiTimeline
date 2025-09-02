@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Misskey.io マルチタイムライン</title>
+    <title>Misskey.io マルチタイムライン(連携対応版)</title>
+    <link rel="canonical" href="https://misskeytimeline.yyya-nico.com/">
     <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192x192.png">
     <script type="module" src="main.js"></script>
 </head>
@@ -64,8 +65,8 @@
                 <input type="checkbox" id="keep-emojis"><label for="keep-emojis">サーバー指定/指定解除時<span class="host"></span>の絵文字を保持</label>
             </div>
         </div>
-        <div class="auth-compatible-link">
-            <a href="//misskeytimeline.yyya-nico.co">連携対応版に移動</a>
+        <div class="authenticate">
+            <label for="authenticate">認証してHTLとSTLも見る</label><button id="authenticate">認証</button>
         </div>
         <details>
             <summary>非推奨(意味がありません)</summary>
