@@ -31,7 +31,6 @@ const resetHostBtn = document.getElementById('reset-host');
 const keepEmojis = document.getElementById('keep-emojis');
 const authenticateLabel = document.querySelector('[for="authenticate"]');
 const authenticateBtn = document.getElementById('authenticate');
-const clearEmojisCacheBtn = document.getElementById('clear-emojis-cache');
 const ioOrigin = 'https://misskey.io';
 const defaultHostText = hostTextWraps[0].textContent;
 const defaultTitle = document.title;
@@ -960,33 +959,5 @@ authenticateBtn.addEventListener('click', async () => {
     await loadTimeline(currentOrigin);
   } else {
     goMiAuth(host);
-  }
-});
-
-clearEmojisCacheBtn.addEventListener('click', async () => {
-  const oldEmojis = localStorage.getItem(`tlEmojis${host}`);
-  localStorage.removeItem(`tlEmojis${host}`);
-  await initEmojis(currentOrigin);
-  const newEmojis = localStorage.getItem(`tlEmojis${host}`);
-  if (oldEmojis === newEmojis) {
-    alert('絵文字URLを再取得しましたが、変更はありませんでした。');
-  } else {
-    const parsed = {
-      oldEmojis: JSON.parse(oldEmojis),
-      newEmojis: JSON.parse(newEmojis)
-    };
-    const oldEmojiNames = Object.keys(parsed.oldEmojis);
-    const newEmojiNames = Object.keys(parsed.newEmojis);
-    const diffEmojiNames = {
-      old: oldEmojiNames.filter(key => !(key in parsed.newEmojis)),
-      new: newEmojiNames.filter(key => !(key in parsed.oldEmojis))
-    };
-    alert(
-`絵文字URLを再取得した結果、変更がありました。
-消去された絵文字(${diffEmojiNames.old.length}件):
-${diffEmojiNames.old.length ? `:${diffEmojiNames.old.join(':\n:')}:` : 'なし'}
-登録された絵文字(${diffEmojiNames.new.length}件):
-${diffEmojiNames.new.length ? `:${diffEmojiNames.new.join(':\n:')}:` : 'なし'}`
-    );
   }
 });
