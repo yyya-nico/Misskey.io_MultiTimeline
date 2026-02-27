@@ -73,7 +73,7 @@ const getDeviceType = () => {
             case 'Android':
                 return betweenText('Android ','[.;]');
             case 'macOS':
-                return betweenText('Mac OS X ','[;)]').replace('_', '.');
+                return betweenText('Mac OS X ','[;)]').replaceAll('_', '.');
             case 'Windows':
                 const ntVersion = Number(betweenText('Windows NT ','[;)]'));
                 switch (ntVersion) {
@@ -99,7 +99,7 @@ const getDeviceType = () => {
                 }
             case 'iOS':
             case 'iPadOS':
-                return betweenText('iPhone;? i?OS |CPU OS ',';? ').replace('_', '.');
+                return betweenText('iPhone;? i?OS |CPU OS ',';? ').replaceAll('_', '.');
             case 'ChromeOS':
                 return betweenText('CrOS ',' ');
 
