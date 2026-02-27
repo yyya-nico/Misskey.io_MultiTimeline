@@ -1,39 +1,30 @@
 import './style.scss'
 import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
-import { parseSimple as mfmParseSimple } from 'mfm-js';
 import MagicGrid from 'magic-grid';
-import {scrollToBottom, htmlspecialchars, nl2br, fromNow, goMiAuth, routing} from './utils';
+import { scrollToBottom, goMiAuth, routing, normalizeHostInput } from './utils';
+import { createEmojiStore } from './emoji-store';
+import { createNoteRenderer } from './note-renderer';
+import { createAuthManager } from './auth';
+import { initializeDomRefs } from './dom-refs';
+import { createAppState } from './state';
 
-await routing();
-const grid = document.querySelector('.grid');
-const containers = document.querySelectorAll('.container');
-const mediaContainers = [...containers].filter(container => ['media','rn-media'].some(className => container.classList.contains(className)));
-const noteList = document.getElementById('notes-list');
-const renoteList = document.getElementById('renotes-list');
-const mediaList = document.getElementById('media-list');
-const rnMediaList = document.getElementById('rn-media-list');
-const notelatestBtn = document.getElementById('note-latest');
-const renotelatestBtn = document.getElementById('renote-latest');
-const mediumlatestBtn = document.getElementById('medium-latest');
-const rnMediumlatestBtn = document.getElementById('rn-medium-latest');
-const resizeHandle = document.querySelector('.resize-handle');
-const menuBtn = document.getElementById('menu-btn');
-const configFrame = document.querySelector('.config');
-const selectDisplay = document.getElementById('select-display');
-const sdValue = document.getElementById('select-display-value');
-const selectTimeline = document.getElementById('select-timeline');
-const misskeyLink = document.querySelector('.misskey-link');
+const authManager = createAuthManager();
+await routing(authManager.processCallback);
+
+const domRefs = initializeDomRefs();
+const { grid, containers, noteList, renoteList, mediaList, rnMediaList, 
+        notelatestBtn, renotelatestBtn, mediumlatestBtn, rnMediumlatestBtn,
+        resizeHandle, menuBtn, configFrame, selectDisplay, sdValue, selectTimeline,
+        misskeyLink, hostTextWraps, customHostForm, customHost, resetHostBtn,
+        keepEmojis, authenticateLabel, authenticateBtn, body } = domRefs;
+
+const mediaContainers = [...containers].filter(container => 
+  ['media','rn-media'].some(className => container.classList.contains(className))
+);
 const mlLink = misskeyLink.querySelector('a');
-const hostTextWraps = document.querySelectorAll('.host');
-const customHostForm = document.forms['custom-host'];
-const customHost = document.getElementById('custom-host');
-const resetHostBtn = document.getElementById('reset-host');
-const keepEmojis = document.getElementById('keep-emojis');
-const authenticateLabel = document.querySelector('[for="authenticate"]');
-const authenticateBtn = document.getElementById('authenticate');
-const ioOrigin = 'https://misskey.io';
 const defaultHostText = hostTextWraps[0].textContent;
 const defaultTitle = document.title;
+
 const mediaMG = new MagicGrid({
   container: mediaList,
   items: 1,
@@ -48,92 +39,19 @@ const rnMediaMG = new MagicGrid({
 });
 mediaMG.listen();
 rnMediaMG.listen();
-let currentOrigin, host;
-const originToHost = origin => origin.replace('https://', '');
 
-const initOrigin = () => {
-  if (localStorage.getItem('tlOrigin')) {
-    currentOrigin = localStorage.getItem('tlOrigin');
-    host = originToHost(currentOrigin);
-    document.title = `${host} マルチタイムライン(連携対応版)`
-    hostTextWraps.forEach(hostTextWrap => {
-      hostTextWrap.textContent = host;
-    });
-    customHost.value = host;
-    configFrame.classList.add('customized-host');
-  } else {
-    currentOrigin = ioOrigin;
-    host = originToHost(currentOrigin);
-    document.title = defaultTitle;
-    hostTextWraps.forEach(hostTextWrap => {
-      hostTextWrap.textContent = defaultHostText;
-    });
-    customHost.value = '';
-    configFrame.classList.remove('customized-host');
-  }
-  mlLink.href = currentOrigin;
-  keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
-}
-initOrigin();
+const appState = createAppState();
+const { ioOrigin, originToHost } = appState;
+appState.initOrigin(domRefs, defaultHostText, defaultTitle);
+let { currentOrigin, host, timelineIndex } = appState.state;
 
-const checkToken = host => {
-  const storedAuths = localStorage.getItem('auths');
-  const auths = storedAuths && JSON.parse(storedAuths) || [];
-  return auths.find(entry => entry.host === host) || null;
-}
-
-let timelineIndex;
-const initAuth = authInfo => {
-  if (authInfo) {
-    const disabledOptions = selectTimeline.querySelectorAll(':disabled');
-    disabledOptions.forEach(option => option.disabled = false);
-    timelineIndex = 0;
-    authenticateLabel.textContent = `@${authInfo.user.username}に接続`;
-    authenticateBtn.textContent = '切断';
-  } else {
-    const disabledOptions = selectTimeline.querySelectorAll('[value="0"], [value="2"]');
-    disabledOptions.forEach(option => option.disabled = true);
-    timelineIndex = 1;
-    authenticateLabel.textContent = '認証してHTLとSTLも見る';
-    authenticateBtn.textContent = '認証';
-  }
-  selectTimeline.value = timelineIndex;
-}
-
-const emojiShortcodeToUrlDic = {};
-const initEmojis = async origin => {
-  const host = originToHost(origin);
-  const moreThan24HoursHavePassed = Date.now() - Number(localStorage.getItem(`tlEmojis${host}Loaded`)) >= 24 * 60 * 60 * 1000;
-  if (localStorage.getItem(`tlEmojis${host}`) && localStorage.getItem(`tlEmojis${host}Loaded`) && !moreThan24HoursHavePassed) {
-    emojiShortcodeToUrlDic[host] = JSON.parse(localStorage.getItem(`tlEmojis${host}`));
-    console.log('Loaded emojis from cache');
-    return;
-  }
-
-  // emojis fetch
-  emojiShortcodeToUrlDic[host] = {};
-  await fetch(`${origin}/api/emojis`)
-    .then(async (response) => {
-      const data = await response.json();
-      if (response.status === 200) {
-        const emojis = data.emojis;
-        emojis.forEach(entry => {
-          emojiShortcodeToUrlDic[host][entry.name] = entry.url;
-        });
-        localStorage.setItem(`tlEmojis${host}`, JSON.stringify(emojiShortcodeToUrlDic[host]));
-        localStorage.setItem(`tlEmojis${host}Loaded`, Date.now());
-      } else {
-        console.log('error or no content', response.status);
-      }
-    }).catch((e) => {
-      console.error('Failed to load Emojis', e);
-  });
-}
-
-let authInfo = checkToken(host);
-initAuth(authInfo);
+let authInfo = authManager.checkToken(host);
+appState.initAuth(authInfo, domRefs);
+timelineIndex = appState.state.timelineIndex;
 const loadTimeline = async origin => {
-  await initEmojis(origin);
+  const emojiStore = createEmojiStore(origin);
+  await emojiStore.initEmojis();
+  const renderer = createNoteRenderer({ origin, emojiStore });
   const stream = new misskeyStream(origin, authInfo ? {token: authInfo.token} : null);
   const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
   const hTimeline = stream.useChannel(channelNames[timelineIndex]);
@@ -156,180 +74,6 @@ const loadTimeline = async origin => {
   const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
   const controller = new AbortController();
   let wakeLock = null;
-
-  const loadAndStoreEmoji = async (name, host) => {
-    emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
-    const cli = new misskeyApi.APIClient({origin: `https://${host}`});
-    await cli.request('emoji', {name: name})
-      .then((data) => {
-        const isValid = data !== null && (host === originToHost(origin) || data.localOnly !== true);
-        emojiShortcodeToUrlDic[host][name] = isValid ? data.url : null;
-        // host !== originToHost(origin) && data.localOnly === true && console.log(`${host}\'s Emoji`, `:${name}:`, 'is local only');
-        // emojiShortcodeToUrlDic[host][name] && console.log(`${host}\'s Emoji`, `:${name}:`, 'stored');
-      }).catch((e) => {
-        console.log(`${host}\'s Emoji`, `:${name}:`, 'not found');
-        console.dir(e);
-        emojiShortcodeToUrlDic[host][name] = null;
-    });
-  }
-
-  const storeExternalEmojisFromNote = note => {
-    const host = note.user.host;
-    emojiShortcodeToUrlDic[host] = emojiShortcodeToUrlDic[host] || {};
-    [note.user.emojis, note.emojis].forEach(emojis => {
-      Object.keys(emojis).forEach(name => {
-        const url = emojis[name];
-        emojiShortcodeToUrlDic[host][name] = url;
-      });
-    });
-    // console.log(`現在の${host}の絵文字記録:`, emojiShortcodeToUrlDic[host]);
-  }
-
-  const emojiShortcodeToUrl = async (name, host) => {
-    // if (host === originToHost(origin)) {
-    //   console.log('external host emoji:', name);
-    // }
-    host = host || originToHost(origin);
-    if (!(host in emojiShortcodeToUrlDic) || !(name in emojiShortcodeToUrlDic[host])) {
-      await loadAndStoreEmoji(name, host);
-    }
-    return emojiShortcodeToUrlDic[host][name] || null;
-  }
-  // console.log(emojiShortcodeToUrl('x_z'));
-
-  const simpleMfmToHTML = async (text, host) => {
-    if (!text) {
-      return '';
-    }
-    const parsedMfm = mfmParseSimple(text);
-    let html = '';
-    for (const node of parsedMfm) {
-      switch(node.type) {
-        case 'emojiCode':
-          const emojiUrl = await emojiShortcodeToUrl(node.props.name, host);
-            if (emojiUrl === null) {
-              html += `:${node.props.name}:`
-            } else {
-              html += `<img class="custom-emoji" src="${emojiUrl}" alt=":${node.props.name}:" title=":${node.props.name}:">`;
-            }
-          break;
-        case 'text':
-          html += nl2br(node.props.text);
-          break;
-        case 'unicodeEmoji':
-          html += node.props.emoji;
-          break;
-      }
-    }
-    return html;
-  }
-  // console.log(simpleMfmToHTML(''));
-  // console.log(simpleMfmToHTML(null));
-  // console.log(simpleMfmToHTML());
-
-  const makeTextHTMLFromNote = async (note, host) => {
-    if (note.cw !== null) {
-      return `[CW]${await simpleMfmToHTML(htmlspecialchars(note.cw), host)} <span class="cwtext">${(await simpleMfmToHTML(htmlspecialchars(note.text), host))}</span>`;
-    } else if (note.text) {
-      return await simpleMfmToHTML(htmlspecialchars(note.text), host);
-    } else if (note.renoteId || note.fileIds.length) {
-      return '';
-    } else {
-      return '<span class="nothing">なにもありません</span>';
-    }
-  }
-
-  const detectSensitiveFile = note => {
-    return note.files.some(file => file.isSensitive);
-  }
-
-  const makeHTMLFromNote = async (note, target) => {
-    note.isRenote = Boolean(note.renoteId);
-    note.host = note.user.host;
-    const renote = note.isRenote ? note.renote : null;
-    renote && (renote.host = renote.user.host);
-    const formatted = {
-      name:      note.user.name ? await simpleMfmToHTML(note.user.name, note.host) : note.user.username,
-      plainName: note.user.name ? note.user.name : note.user.username,
-      text:      await makeTextHTMLFromNote(note, note.host),
-      fileCount: note.fileIds.length ? `<span class="file-count">[${note.fileIds.length}つのファイル]</span>` : '',
-      time:      new Date(note.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', second: '2-digit'}),
-      containsSensitive: (detectSensitiveFile(note) || renote && detectSensitiveFile(renote)) ? 'contains-sensitive' : '',
-      ...(target === 'renote' && {
-        rnName:      renote.user.name ? await simpleMfmToHTML(renote.user.name, renote.host) : renote.user.username,
-        plainRnName: renote.user.name ? renote.user.name : renote.user.username,
-        rnText:      await makeTextHTMLFromNote(renote, renote.host),
-        rnFileCount: renote.fileIds.length ? `<span class="file-count">[${renote.fileIds.length}つのファイル]</span>` : '',
-        rnTime: fromNow(new Date(renote.createdAt))
-      })
-    };
-    const html = target === 'note' ?
-    `<li data-id="${note.id}" class="${formatted.containsSensitive}">
-      <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${origin}/notes/${note.id}" class="time" target="misskey" rel="noopener">${formatted.time}</a>
-    </li>
-    `
-    : target === 'renote' ?
-    `<li data-id="${note.id}" class="${formatted.containsSensitive}">
-      <div class="renote-info">
-        <span class="wrap"><span class="name" title="${formatted.plainName}">${formatted.name}</span><span class="text">${formatted.text}${formatted.fileCount}</span></span><a href="${origin}/notes/${note.id}" class="time" target="misskey" rel="noopener">${formatted.time}</a>
-      </div>
-      <div class="renoted-note">
-        <span class="wrap"><span class="name" title="${formatted.plainRnName}">${formatted.rnName}</span><span class="text">${formatted.rnText}${formatted.rnFileCount}</span></span><a href="${origin}/notes/${renote.id}" class="time" target="misskey" rel="noopener">${formatted.rnTime}</a>
-      </div>
-    </li>
-    `
-    : false;
-    return html;
-  };
-
-  const makeHTMLFromNoteForMedia = async (note, target) => {
-    note.isRenote = Boolean(note.renoteId);
-    note.host = note.user.host;
-    const renote = note.isRenote ? note.renote : null;
-    renote && (renote.host = renote.user.host);
-    const targetNote = target === 'note' && note || target === 'renote' && renote;
-    const firstFile = targetNote.files[0];
-    const formatted = {
-      text:      await makeTextHTMLFromNote(targetNote, targetNote.host),
-      fileCount: (note => {return note.fileIds.length > 1 ? `<span class="more-file-count">+ ${note.fileIds.length - 1}</span>` : '';})(targetNote),
-      containsSensitive: detectSensitiveFile(targetNote) || targetNote.cw !== null ? 'contains-sensitive' : ''
-    };
-    const html = firstFile.type.includes('image') || firstFile.type.includes('video') ?
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel="noopener">
-        <img src="${firstFile.thumbnailUrl || ''}" alt="${firstFile.comment || firstFile.name}" class="${firstFile.isSensitive || targetNote.cw !== null ? 'is-sensitive' : ''}" ${firstFile.type.includes('image') ? `width="${firstFile.properties.width}" height="${firstFile.properties.height}"` : ''}>
-        ${firstFile.type.includes('video') ? '<span class="is-video">動画</span>' : ''}
-        ${formatted.fileCount}
-      </a>${formatted.text &&`
-      <div class="text">
-        ${formatted.text}
-      </div>`}
-    </li>
-    `
-    : firstFile.type.includes('audio') ?
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel="noopener">
-        <span class="file-type">音声</span>
-        ${formatted.fileCount}
-      </a>${formatted.text &&`
-      <div class="text">
-        ${formatted.text}
-      </div>`}
-    </li>
-    `
-    :
-    `<li data-id="${note.id}" ${renote ? `data-rn-id="${renote.id}"` : ''} class="${formatted.containsSensitive}">
-      <a href="${origin}/notes/${note.id}" class="link" target="misskey" rel="noopener">
-        <span class="file-type">その他:${firstFile.type}</span>
-        ${formatted.fileCount}
-      </a>${formatted.text &&`
-      <div class="text">
-        ${formatted.text}
-      </div>`}
-    </li>
-    `;
-    return html;
-  };
 
   const overflowJudgment = () => {
     const textWraps = document.querySelectorAll('li .wrap');
@@ -439,93 +183,88 @@ const loadTimeline = async origin => {
   mediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
   rnMediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
 
-  Node.prototype.appendToTl = async function(noteOrNotes) {
-    if (this !== noteList && this !== renoteList && this !== mediaList && this !== rnMediaList) {
+  const appendToTimeline = async (targetList, noteOrNotes) => {
+    if (targetList !== noteList && targetList !== renoteList && targetList !== mediaList && targetList !== rnMediaList) {
       return false;
     }
-    // console.log(note);
     const isNote = !Array.isArray(noteOrNotes);
     let html = '';
-    if (this === noteList || this === renoteList ) {
-      const target = this === noteList && 'note' || this === renoteList && 'renote';
+
+    if (targetList === noteList || targetList === renoteList) {
+      const target = targetList === noteList ? 'note' : 'renote';
       if (isNote) {
-        const note = noteOrNotes;
-        html = await makeHTMLFromNote(note, target);
+        html = await renderer.makeHTMLFromNote(noteOrNotes, target);
       } else {
         const notes = noteOrNotes;
         while (notes.length) {
-          html += await makeHTMLFromNote(notes.shift(), target);
-          // console.log('note shifted, notes count:', notes.length);
+          html += await renderer.makeHTMLFromNote(notes.shift(), target);
         }
       }
-      this.insertAdjacentHTML('beforeend', html);
-      // console.log('note count:',this.querySelectorAll('li').length);
-      if (autoShowNew[this === noteList && 'note' || this === renoteList && 'renote']) {
-        scrollToBottom(this.parentElement);
+      targetList.insertAdjacentHTML('beforeend', html);
+      if (autoShowNew[target]) {
+        scrollToBottom(targetList.parentElement);
       }
-      while (this.querySelectorAll('li').length > noteLimit) {
-        this.firstElementChild.remove();
+      while (targetList.querySelectorAll('li').length > noteLimit) {
+        targetList.firstElementChild.remove();
       }
-    } else if (this === mediaList || this === rnMediaList) {
-      const target = this === mediaList && 'note' || this === rnMediaList && 'renote';
-      const notesLengthCache = !isNote && noteOrNotes.length || 1;
+    } else if (targetList === mediaList || targetList === rnMediaList) {
+      const target = targetList === mediaList ? 'note' : 'renote';
+      const notesLengthCache = !isNote ? noteOrNotes.length : 1;
       if (isNote) {
         const note = noteOrNotes;
-        if (target == 'renote') {
+        if (target === 'renote') {
           const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
           alreadyRN && alreadyRN.remove();
         }
-        html = await makeHTMLFromNoteForMedia(note, target);
+        html = await renderer.makeHTMLFromNoteForMedia(note, target);
       } else {
         const notes = noteOrNotes;
         while (notes.length) {
           const note = notes.pop();
-          // console.log('note poped, notes count:', notes.length);
-          if (target == 'renote') {
+          if (target === 'renote') {
             const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
             alreadyRN && alreadyRN.remove();
           }
-          html += await makeHTMLFromNoteForMedia(note, target);
+          html += await renderer.makeHTMLFromNoteForMedia(note, target);
         }
       }
-      this.insertAdjacentHTML('afterbegin', html);
-      if (autoShowNew[this === mediaList && 'medium' || this === rnMediaList && 'rnMedium']) {
-        this.parentElement.scrollTo({top: 0});
+      targetList.insertAdjacentHTML('afterbegin', html);
+      if (autoShowNew[targetList === mediaList ? 'medium' : 'rnMedium']) {
+        targetList.parentElement.scrollTo({ top: 0 });
       }
-      while (this.querySelectorAll('li').length > noteLimit) {
-        this.lastElementChild.remove();
+      while (targetList.querySelectorAll('li').length > noteLimit) {
+        targetList.lastElementChild.remove();
       }
-      // console.log(this.id, 'before positionItems()');
-      // console.time(this.id);
-      const appendedItems = [...this.children].slice(0, notesLengthCache);
-      const someAppendedItemsAreDisplayed = appendedItems
-        .some(elem => getComputedStyle(elem).display !== 'none');
-      // this === rnMediaList && console.log(appendedItems, someAppendedItemsAreDisplayed);
+      const appendedItems = [...targetList.children].slice(0, notesLengthCache);
+      const someAppendedItemsAreDisplayed = appendedItems.some(
+        elem => getComputedStyle(elem).display !== 'none'
+      );
       if (someAppendedItemsAreDisplayed) {
-        if (this === mediaList ) {
+        if (targetList === mediaList) {
           mediaMG.positionItems();
-        } else if (this === rnMediaList) {
+        } else if (targetList === rnMediaList) {
           rnMediaMG.positionItems();
         }
-        // console.log(this.id, 'positionItems()');
       }
-      // console.timeEnd(this.id);
       const videoThumbnailImgs = appendedItems
         .map(elem => elem.querySelector('img'))
         .filter(img => img && img.style.width === '' && img.src !== '');
       videoThumbnailImgs.forEach(img => {
-        img.addEventListener('load', () => {
-          if (this === mediaList) {
-            mediaMG.positionItems();
-          } else if (this === rnMediaList) {
-            rnMediaMG.positionItems();
-          }
-        }, {once: true});
-        // console.log('videoThumbnailImgs', img);
+        img.addEventListener(
+          'load',
+          () => {
+            if (targetList === mediaList) {
+              mediaMG.positionItems();
+            } else if (targetList === rnMediaList) {
+              rnMediaMG.positionItems();
+            }
+          },
+          { once: true }
+        );
       });
     }
     overflowJudgment();
-  }
+  };
 
   stream.on('_connected_', async () => {
     console.log('connected');
@@ -554,12 +293,12 @@ const loadTimeline = async origin => {
     const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
     const host = note.user.host;
     if (host) {
-      storeExternalEmojisFromNote(note);
+      emojiStore.storeExternalEmojisFromNote(note);
       // console.log(note);
     }
     if (isNoteOrQuote) {
       if (autoShowNew.note) {
-        await noteList.appendToTl(note);//RN以外
+        await appendToTimeline(noteList, note);//RN以外
       } else {
         stored.notes.push(note);//RN以外
         // console.log('note pushed, stored notes count:',stored.notes.length);
@@ -572,11 +311,11 @@ const loadTimeline = async origin => {
       const renote = note.renote;
       const host = renote.user.host;
       if (host) {
-        storeExternalEmojisFromNote(renote);
+        emojiStore.storeExternalEmojisFromNote(renote);
         // console.log(renote);
       }
       if (autoShowNew.renote) {
-        await renoteList.appendToTl(note);//RN
+        await appendToTimeline(renoteList, note);//RN
       } else {
         stored.renotes.push(note);//RN
         // console.log('renote pushed, stored renotes count:',stored.renotes.length);
@@ -587,7 +326,7 @@ const loadTimeline = async origin => {
     }
     if (note.fileIds.length) {
       if (autoShowNew.medium) {
-        await mediaList.appendToTl(note);
+        await appendToTimeline(mediaList, note);
       } else {
         stored.media.push(note);
         // console.log('media pushed, stored media count:',stored.media.length);
@@ -598,7 +337,7 @@ const loadTimeline = async origin => {
     }
     if (isRenote && note.renote.fileIds.length) {
       if (autoShowNew.rnMedium) {
-        await rnMediaList.appendToTl(note);
+        await appendToTimeline(rnMediaList, note);
       } else {
         const deleteIndex = stored.rnMedia.findIndex(storedNote => storedNote.renoteId === note.renoteId);
         if (deleteIndex !== -1) {
@@ -634,16 +373,16 @@ const loadTimeline = async origin => {
     latestBtn.textContent = '読み込み中...';
     if (latestBtn === notelatestBtn) {
       autoShowNew.note = true;
-      await noteList.appendToTl(stored.notes);//RN以外
+      await appendToTimeline(noteList, stored.notes);//RN以外
     } else if (latestBtn === renotelatestBtn) {
       autoShowNew.renote = true;
-      await renoteList.appendToTl(stored.renotes);//RN
+      await appendToTimeline(renoteList, stored.renotes);//RN
     } else if (latestBtn === mediumlatestBtn) {
       autoShowNew.medium = true;
-      await mediaList.appendToTl(stored.media);//Media
+      await appendToTimeline(mediaList, stored.media);//Media
     } else if (latestBtn === rnMediumlatestBtn) {
       autoShowNew.rnMedium = true;
-      await rnMediaList.appendToTl(stored.rnMedia);//RNMedia
+      await appendToTimeline(rnMediaList, stored.rnMedia);//RNMedia
     }
     latestBtn.classList.remove('show');
     latestBtn.textContent = '新しいノートを見る';
@@ -670,9 +409,9 @@ const loadTimeline = async origin => {
         } else {
           if (stored[containerRole].length) {
             if (containerRole === 'notes') {
-              await noteList.appendToTl(stored.notes);//RN以外
+              await appendToTimeline(noteList, stored.notes);//RN以外
             } else if (containerRole === 'renotes') {
-              await renoteList.appendToTl(stored.renotes);//RN
+              await appendToTimeline(renoteList, stored.renotes);//RN
             }
           } else {
             autoShowNew[containerRole.slice(0,-1)] = true;
@@ -686,9 +425,9 @@ const loadTimeline = async origin => {
         } else {
           if (stored[containerRole === 'media' && 'media' || containerRole === 'rn-media' && 'rnMedia'].length) {
             if (containerRole === 'media') {
-              await mediaList.appendToTl(stored.media);//Media
+              await appendToTimeline(mediaList, stored.media);//Media
             } else if (containerRole === 'rn-media') {
-              await rnMediaList.appendToTl(stored.rnMedia);//RNMedia
+              await appendToTimeline(rnMediaList, stored.rnMedia);//RNMedia
             }
           }
           autoShowNew[containerRole === 'media' && 'medium' || containerRole === 'rn-media' && 'rnMedium'] = true;
@@ -884,7 +623,6 @@ resizeHandle.addEventListener('dblclick', () => {
   loadTimeline.notesScrollToBottom();
 });
 
-const body = document.body;
 const overlayPointerdownHandler = e => {
   if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {
     body.classList.remove('show-config');
@@ -913,7 +651,7 @@ selectTimeline.addEventListener('change', async () => {
 customHostForm.addEventListener('submit', async e => {
   e.preventDefault();
   loadTimeline.dispose();
-  customHost.value = customHost.value.replace(/https:\/\/(.+)\/?/g,'$1');
+  customHost.value = normalizeHostInput(customHost.value);
   if (customHost.value !== originToHost(ioOrigin)) {
     localStorage.setItem('tlOrigin', `https://${customHost.value}`);
     if (currentOrigin !== ioOrigin) {
@@ -925,9 +663,12 @@ customHostForm.addEventListener('submit', async e => {
   } else {
     localStorage.removeItem('tlOrigin');
   }
-  initOrigin();
-  authInfo = checkToken(host);
-  initAuth(authInfo);
+  appState.initOrigin(domRefs, defaultHostText, defaultTitle);
+  currentOrigin = appState.state.currentOrigin;
+  host = appState.state.host;
+  authInfo = authManager.checkToken(host);
+  appState.initAuth(authInfo, domRefs);
+  timelineIndex = appState.state.timelineIndex;
   keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   await loadTimeline(currentOrigin);
 });
@@ -939,23 +680,23 @@ resetHostBtn.addEventListener('click', async () => {
     localStorage.removeItem(`tlEmojis${host}`);
     localStorage.removeItem(`tlEmojis${host}Loaded`);
   }
-  initOrigin();
-  authInfo = checkToken(host);
-  initAuth(authInfo);
+  appState.initOrigin(domRefs, defaultHostText, defaultTitle);
+  currentOrigin = appState.state.currentOrigin;
+  host = appState.state.host;
+  authInfo = authManager.checkToken(host);
+  appState.initAuth(authInfo, domRefs);
+  timelineIndex = appState.state.timelineIndex;
   keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   await loadTimeline(currentOrigin);
 });
 
 authenticateBtn.addEventListener('click', async () => {
   if (authInfo) {
-    const storedAuths = localStorage.getItem('auths');
-    const auths = storedAuths && JSON.parse(storedAuths) || [];
-    const deleteIndex = auths.findIndex(entry => entry.host === host);
-    auths.splice(deleteIndex, 1);
-    localStorage.setItem('auths', JSON.stringify(auths));
+    authManager.removeAuthInfo(host);
     loadTimeline.dispose();
     authInfo = null;
-    initAuth(authInfo);
+    appState.initAuth(authInfo, domRefs);
+    timelineIndex = appState.state.timelineIndex;
     await loadTimeline(currentOrigin);
   } else {
     goMiAuth(host);

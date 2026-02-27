@@ -1,5 +1,3 @@
-import { api as misskeyApi } from 'misskey-js';
-
 const scrollToBottom = node => {
     node.scrollTo({top: node.scrollHeight});
 }
@@ -142,39 +140,19 @@ const goMiAuth = host => {
   location.href = miAuthUrl.toString();
 }
 
-const saveToken = async () => {
-    const params = new URLSearchParams(location.search);
-    history.replaceState(null, null, '/');
-    const sessionId = params.get('session');
-    const host = params.get('host');
-    if (!sessionId || !host) {
-        return;
+const normalizeHostInput = input => {
+    if (typeof input !== 'string') {
+        return '';
     }
-    const cli = new misskeyApi.APIClient({origin: `https://${host}`});
-    await cli.request(`miauth/${sessionId}/check`, {})
-      .then(data => {
-        if (data.ok) {
-          const storedAuths = localStorage.getItem('auths');
-          const auths = storedAuths && JSON.parse(storedAuths) || [];
-          auths.push({
-            host: host,
-            token: data.token,
-            user: data.user
-          });
-          localStorage.setItem('auths', JSON.stringify(auths));
-        }
-      }).catch((e) => {
-        console.log(`${host}\'s miauth/{session}/check could not load`);
-        console.dir(e);
-    });
+    return input.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 }
 
-const routing = async () => {
+const routing = async (processCallback) => {
     switch (location.pathname) {
         case '/':
             break;
         case '/callback':
-            await saveToken();
+            await processCallback();
             break;
         default:
             alert('指定のURLにはページがありません。');
@@ -182,4 +160,4 @@ const routing = async () => {
     }
 }
 
-export {scrollToBottom, htmlspecialchars, nl2br, fromNow, goMiAuth, routing}
+export {scrollToBottom, htmlspecialchars, nl2br, fromNow, goMiAuth, routing, normalizeHostInput}
