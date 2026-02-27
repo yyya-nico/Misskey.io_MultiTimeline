@@ -79,11 +79,24 @@ const loadTimeline = async (origin) => {
   const hTimeline = stream.useChannel(channelNames[timelineIndex]);
   // const stream = new misskeyStream(origin, {token: ''});
   // const hTimeline = stream.useChannel('homeTimeline');
+  const roles = ['notes', 'renotes', 'media', 'rn-media'];
+  const roleToTypePair = {
+    notes: 'note',
+    renotes: 'renote',
+    media: 'medium',
+    'rn-media': 'rnMedium',
+  };
   const autoShowNew = {
     note: true,
     renote: true,
     medium: true,
     rnMedium: true,
+  };
+  const beforeAutoShowNew = {
+    note: false,
+    renote: false,
+    medium: false,
+    rnMedium: false,
   };
   const stored = {
     notes: [],
@@ -92,8 +105,20 @@ const loadTimeline = async (origin) => {
     rnMedia: [],
   };
   const noteLimit = 150;
-  const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
-  const sdValueStrings = ['全て', 'NSFW除外', 'NSFWのみ'];
+  const displayModes = [
+    {
+      name: 'all',
+      label: '全て',
+    },
+    {
+      name: 'hide-sensitive',
+      label: 'NSFW除外',
+    },
+    {
+      name: 'sensitive-only',
+      label: 'NSFWのみ',
+    },
+  ];
   const controller = new AbortController();
   let wakeLock = null;
 
@@ -136,12 +161,6 @@ const loadTimeline = async (origin) => {
     { signal: controller.signal }
   );
 
-  const beforeAutoShowNew = {
-    note: false,
-    renote: false,
-    medium: false,
-    rnMedium: false,
-  };
   const textToggleHandler = (e) => {
     if (selecting) {
       selecting = false;
@@ -223,22 +242,18 @@ const loadTimeline = async (origin) => {
     signal: controller.signal,
   });
 
+  const listElems = [noteList, renoteList, mediaList, rnMediaList];
   const appendToTimeline = async (targetList, noteOrNotes) => {
-    if (targetList !== noteList && targetList !== renoteList && targetList !== mediaList && targetList !== rnMediaList) {
+    if (!listElems.includes(targetList)) {
       return false;
     }
-    const isNote = !Array.isArray(noteOrNotes);
+    const notes = Array.isArray(noteOrNotes) ? noteOrNotes : [noteOrNotes];
     let html = '';
 
-    if (targetList === noteList || targetList === renoteList) {
+    if ([noteList, renoteList].includes(targetList)) {
       const target = targetList === noteList ? 'note' : 'renote';
-      if (isNote) {
-        html = await renderer.makeHTMLFromNote(noteOrNotes, target);
-      } else {
-        const notes = noteOrNotes;
-        while (notes.length) {
-          html += await renderer.makeHTMLFromNote(notes.shift(), target);
-        }
+      while (notes.length) {
+        html += await renderer.makeHTMLFromNote(notes.shift(), target);
       }
       targetList.insertAdjacentHTML('beforeend', html);
       if (autoShowNew[target]) {
@@ -247,26 +262,16 @@ const loadTimeline = async (origin) => {
       while (targetList.querySelectorAll('li').length > noteLimit) {
         targetList.firstElementChild.remove();
       }
-    } else if (targetList === mediaList || targetList === rnMediaList) {
+    } else if ([mediaList, rnMediaList].includes(targetList)) {
       const target = targetList === mediaList ? 'note' : 'renote';
-      const notesLengthCache = !isNote ? noteOrNotes.length : 1;
-      if (isNote) {
-        const note = noteOrNotes;
+      const notesLengthCache = notes.length;
+      while (notes.length) {
+        const note = notes.pop();
         if (target === 'renote') {
           const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
           alreadyRN && alreadyRN.remove();
         }
-        html = await renderer.makeHTMLFromNoteForMedia(note, target);
-      } else {
-        const notes = noteOrNotes;
-        while (notes.length) {
-          const note = notes.pop();
-          if (target === 'renote') {
-            const alreadyRN = rnMediaList.querySelector(`[data-rn-id="${note.renoteId}"]`);
-            alreadyRN && alreadyRN.remove();
-          }
-          html += await renderer.makeHTMLFromNoteForMedia(note, target);
-        }
+        html += await renderer.makeHTMLFromNoteForMedia(note, target);
       }
       targetList.insertAdjacentHTML('afterbegin', html);
       if (autoShowNew[targetList === mediaList ? 'medium' : 'rnMedium']) {
@@ -449,42 +454,40 @@ const loadTimeline = async (origin) => {
   });
 
   containers.forEach((container) => {
+    const latestBtn = container.querySelector('button[id$="-latest"]');
+    const role = roles.find((role) => container.classList.contains(role));
+    const type = roleToTypePair[role];
     container.addEventListener(
       'scroll',
       async (e) => {
-        const latestBtn = container.querySelector('button[id$="-latest"]');
-        const roles = ['notes', 'renotes', 'media', 'rn-media'];
-        const containerRole = roles.find((role) => container.classList.contains(role));
         // console.log('scrolled: '+ containerRole);
-        if (containerRole === 'notes' || containerRole === 'renotes') {
+        if (role.includes('notes')) {
           if (container.scrollHeight - container.clientHeight - container.scrollTop >= 3) {
-            autoShowNew[containerRole.slice(0, -1)] = false;
+            autoShowNew[type] = false;
             latestBtn.classList.add('show');
           } else {
-            if (stored[containerRole].length) {
-              if (containerRole === 'notes') {
+            if (stored[role].length) {
+              if (role === 'notes') {
                 await appendToTimeline(noteList, stored.notes); //RN以外
-              } else if (containerRole === 'renotes') {
+              } else if (role === 'renotes') {
                 await appendToTimeline(renoteList, stored.renotes); //RN
               }
             } else {
-              autoShowNew[containerRole.slice(0, -1)] = true;
+              autoShowNew[type] = true;
               latestBtn.classList.remove('show');
             }
           }
-        } else if (containerRole === 'media' || containerRole === 'rn-media') {
+        } else if (role.includes('media')) {
           if (container.scrollTop > 1) {
-            autoShowNew[(containerRole === 'media' && 'medium') || (containerRole === 'rn-media' && 'rnMedium')] = false;
+            autoShowNew[type] = false;
             latestBtn.classList.add('show');
           } else {
-            if (stored[(containerRole === 'media' && 'media') || (containerRole === 'rn-media' && 'rnMedia')].length) {
-              if (containerRole === 'media') {
-                await appendToTimeline(mediaList, stored.media); //Media
-              } else if (containerRole === 'rn-media') {
-                await appendToTimeline(rnMediaList, stored.rnMedia); //RNMedia
-              }
+            if (stored.media.length && role === 'media') {
+              await appendToTimeline(mediaList, stored.media); //Media
+            } else if (stored.rnMedia.length && role === 'rn-media') {
+              await appendToTimeline(rnMediaList, stored.rnMedia); //RNMedia
             }
-            autoShowNew[(containerRole === 'media' && 'medium') || (containerRole === 'rn-media' && 'rnMedium')] = true;
+            autoShowNew[type] = true;
             latestBtn.classList.remove('show');
           }
         }
@@ -531,14 +534,14 @@ const loadTimeline = async (origin) => {
     } else {
       selectDisplay.value = tlDisplay;
     }
-    sdValue.textContent = sdValueStrings[selectDisplay.value];
+    sdValue.textContent = displayModes[selectDisplay.value].label;
   }
   let sdIndexCache = selectDisplay.value;
-  grid.classList.add(tlDisplayClassNames[sdIndexCache]);
+  grid.classList.add(displayModes[sdIndexCache].name);
   selectDisplay.addEventListener(
     'pointerdown',
     () => {
-      sdValue.textContent = sdValueStrings[sdIndexCache];
+      sdValue.textContent = displayModes[sdIndexCache].label;
     },
     { once: true, signal: controller.signal }
   );
@@ -559,9 +562,9 @@ const loadTimeline = async (origin) => {
       } else {
         localStorage.removeItem('tlDisplay');
       }
-      grid.classList.add(tlDisplayClassNames[selectDisplay.value]);
-      sdValue.textContent = sdValueStrings[selectDisplay.value];
-      grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
+      grid.classList.add(displayModes[selectDisplay.value].name);
+      sdValue.textContent = displayModes[selectDisplay.value].label;
+      grid.classList.remove(displayModes[sdIndexCache].name);
       sdIndexCache = selectDisplay.value;
       if (autoShowNew.note) {
         scrollToBottom(noteList.parentElement);
