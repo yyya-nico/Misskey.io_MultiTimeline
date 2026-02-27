@@ -1,4 +1,4 @@
-import './style.scss'
+import './style.scss';
 import { Stream as misskeyStream, api as misskeyApi } from 'misskey-js';
 import MagicGrid from 'magic-grid';
 import { scrollToBottom, goMiAuth, routing, normalizeHostInput } from './utils';
@@ -12,14 +12,36 @@ const authManager = createAuthManager();
 await routing(authManager.processCallback);
 
 const domRefs = initializeDomRefs();
-const { grid, containers, noteList, renoteList, mediaList, rnMediaList, 
-        notelatestBtn, renotelatestBtn, mediumlatestBtn, rnMediumlatestBtn,
-        resizeHandle, menuBtn, configFrame, selectDisplay, sdValue, selectTimeline,
-        misskeyLink, hostTextWraps, customHostForm, customHost, resetHostBtn,
-        keepEmojis, authenticateLabel, authenticateBtn, body } = domRefs;
+const {
+  grid,
+  containers,
+  noteList,
+  renoteList,
+  mediaList,
+  rnMediaList,
+  notelatestBtn,
+  renotelatestBtn,
+  mediumlatestBtn,
+  rnMediumlatestBtn,
+  resizeHandle,
+  menuBtn,
+  configFrame,
+  selectDisplay,
+  sdValue,
+  selectTimeline,
+  misskeyLink,
+  hostTextWraps,
+  customHostForm,
+  customHost,
+  resetHostBtn,
+  keepEmojis,
+  authenticateLabel,
+  authenticateBtn,
+  body,
+} = domRefs;
 
-const mediaContainers = [...containers].filter(container => 
-  ['media','rn-media'].some(className => container.classList.contains(className))
+const mediaContainers = [...containers].filter((container) =>
+  ['media', 'rn-media'].some((className) => container.classList.contains(className))
 );
 const mlLink = misskeyLink.querySelector('a');
 const defaultHostText = hostTextWraps[0].textContent;
@@ -29,13 +51,13 @@ const mediaMG = new MagicGrid({
   container: mediaList,
   items: 1,
   gutter: 20,
-  animate: true
+  animate: true,
 });
 const rnMediaMG = new MagicGrid({
   container: rnMediaList,
   items: 1,
   gutter: 20,
-  animate: true
+  animate: true,
 });
 mediaMG.listen();
 rnMediaMG.listen();
@@ -48,12 +70,12 @@ let { currentOrigin, host, timelineIndex } = appState.state;
 let authInfo = authManager.checkToken(host);
 appState.initAuth(authInfo, domRefs);
 timelineIndex = appState.state.timelineIndex;
-const loadTimeline = async origin => {
+const loadTimeline = async (origin) => {
   const emojiStore = createEmojiStore(origin);
   await emojiStore.initEmojis();
   const renderer = createNoteRenderer({ origin, emojiStore });
-  const stream = new misskeyStream(origin, authInfo ? {token: authInfo.token} : null);
-  const channelNames = ['homeTimeline','localTimeline','hybridTimeline','globalTimeline'];
+  const stream = new misskeyStream(origin, authInfo ? { token: authInfo.token } : null);
+  const channelNames = ['homeTimeline', 'localTimeline', 'hybridTimeline', 'globalTimeline'];
   const hTimeline = stream.useChannel(channelNames[timelineIndex]);
   // const stream = new misskeyStream(origin, {token: ''});
   // const hTimeline = stream.useChannel('homeTimeline');
@@ -61,13 +83,13 @@ const loadTimeline = async origin => {
     note: true,
     renote: true,
     medium: true,
-    rnMedium: true
+    rnMedium: true,
   };
   const stored = {
     notes: [],
     renotes: [],
     media: [],
-    rnMedia: []
+    rnMedia: [],
   };
   const noteLimit = 150;
   const tlDisplayClassNames = ['all', 'hide-sensitive', 'sensitive-only'];
@@ -77,7 +99,7 @@ const loadTimeline = async origin => {
 
   const overflowJudgment = () => {
     const textWraps = document.querySelectorAll('li .wrap');
-    textWraps.forEach(wrap => {
+    textWraps.forEach((wrap) => {
       const text = wrap.querySelector('.text');
       if (wrap.classList.contains('is-open') || wrap.offsetWidth < wrap.scrollWidth || text.querySelector('br')) {
         text.classList.add('is-long');
@@ -86,36 +108,46 @@ const loadTimeline = async origin => {
       }
     });
     const texts = document.querySelectorAll('li > div.text');
-    texts.forEach(text => {
+    texts.forEach((text) => {
       if (text.classList.contains('is-open') || text.offsetWidth < text.scrollWidth || text.querySelector('br')) {
         text.classList.add('is-long');
       } else {
         text.classList.remove('is-long');
       }
     });
-  }
+  };
 
-  window.addEventListener('resize', overflowJudgment, {signal: controller.signal});
+  window.addEventListener('resize', overflowJudgment, {
+    signal: controller.signal,
+  });
 
   let selecting = false;
-  document.addEventListener('selectstart', () => {
-    document.addEventListener('pointerup', () => {
-      selecting = !window.getSelection().isCollapsed;
-    }, {once: true, signal: controller.signal});
-  }, {signal: controller.signal});
+  document.addEventListener(
+    'selectstart',
+    () => {
+      document.addEventListener(
+        'pointerup',
+        () => {
+          selecting = !window.getSelection().isCollapsed;
+        },
+        { once: true, signal: controller.signal }
+      );
+    },
+    { signal: controller.signal }
+  );
 
   const beforeAutoShowNew = {
     note: false,
     renote: false,
     medium: false,
-    rnMedium: false
-  }
-  const textToggleHandler = e => {
+    rnMedium: false,
+  };
+  const textToggleHandler = (e) => {
     if (selecting) {
       selecting = false;
       return;
     }
-    if (e.target.closest('.is-long') || e.target.closest('.wrap') && e.target.querySelector('.is-long')) {
+    if (e.target.closest('.is-long') || (e.target.closest('.wrap') && e.target.querySelector('.is-long'))) {
       e.target.closest('.wrap').classList.toggle('is-open');
       if (e.target.closest('.wrap').classList.contains('is-open')) {
         if (e.currentTarget === noteList) {
@@ -139,12 +171,16 @@ const loadTimeline = async origin => {
         }
       }
     }
-  }
+  };
 
-  noteList.addEventListener('click', textToggleHandler, {signal: controller.signal});
-  renoteList.addEventListener('click', textToggleHandler, {signal: controller.signal});
+  noteList.addEventListener('click', textToggleHandler, {
+    signal: controller.signal,
+  });
+  renoteList.addEventListener('click', textToggleHandler, {
+    signal: controller.signal,
+  });
 
-  const mediaTextToggleHandler = e => {
+  const mediaTextToggleHandler = (e) => {
     if (selecting) {
       selecting = false;
       return;
@@ -178,10 +214,14 @@ const loadTimeline = async origin => {
         }
       }
     }
-  }
+  };
 
-  mediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
-  rnMediaList.addEventListener('click', mediaTextToggleHandler, {signal: controller.signal});
+  mediaList.addEventListener('click', mediaTextToggleHandler, {
+    signal: controller.signal,
+  });
+  rnMediaList.addEventListener('click', mediaTextToggleHandler, {
+    signal: controller.signal,
+  });
 
   const appendToTimeline = async (targetList, noteOrNotes) => {
     if (targetList !== noteList && targetList !== renoteList && targetList !== mediaList && targetList !== rnMediaList) {
@@ -236,9 +276,7 @@ const loadTimeline = async origin => {
         targetList.lastElementChild.remove();
       }
       const appendedItems = [...targetList.children].slice(0, notesLengthCache);
-      const someAppendedItemsAreDisplayed = appendedItems.some(
-        elem => getComputedStyle(elem).display !== 'none'
-      );
+      const someAppendedItemsAreDisplayed = appendedItems.some((elem) => getComputedStyle(elem).display !== 'none');
       if (someAppendedItemsAreDisplayed) {
         if (targetList === mediaList) {
           mediaMG.positionItems();
@@ -247,9 +285,9 @@ const loadTimeline = async origin => {
         }
       }
       const videoThumbnailImgs = appendedItems
-        .map(elem => elem.querySelector('img'))
-        .filter(img => img && img.style.width === '' && img.src !== '');
-      videoThumbnailImgs.forEach(img => {
+        .map((elem) => elem.querySelector('img'))
+        .filter((img) => img && img.style.width === '' && img.src !== '');
+      videoThumbnailImgs.forEach((img) => {
         img.addEventListener(
           'load',
           () => {
@@ -275,19 +313,23 @@ const loadTimeline = async origin => {
 
   stream.on('_disconnected_', () => {
     console.log('disconnected');
-    wakeLock !== null && wakeLock.release()
-    .then(() => {
-      wakeLock = null;
-    });
+    wakeLock !== null &&
+      wakeLock.release().then(() => {
+        wakeLock = null;
+      });
   });
 
-  document.addEventListener('visibilitychange', async () => {
-    if (wakeLock !== null && document.visibilityState === 'visible' && stream.state == 'connected') {
-      wakeLock = await navigator.wakeLock.request('screen');
-    }
-  }, {signal: controller.signal});
+  document.addEventListener(
+    'visibilitychange',
+    async () => {
+      if (wakeLock !== null && document.visibilityState === 'visible' && stream.state == 'connected') {
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    },
+    { signal: controller.signal }
+  );
 
-  const parseNote = async note => {
+  const parseNote = async (note) => {
     // console.log(note);
     const isRenote = Boolean(note.renoteId);
     const isNoteOrQuote = Boolean(note.text !== null || note.fileIds.length || !isRenote);
@@ -298,9 +340,9 @@ const loadTimeline = async origin => {
     }
     if (isNoteOrQuote) {
       if (autoShowNew.note) {
-        await appendToTimeline(noteList, note);//RN以外
+        await appendToTimeline(noteList, note); //RN以外
       } else {
-        stored.notes.push(note);//RN以外
+        stored.notes.push(note); //RN以外
         // console.log('note pushed, stored notes count:',stored.notes.length);
         if (stored.notes.length > noteLimit) {
           stored.notes = stored.notes.slice(-noteLimit);
@@ -315,9 +357,9 @@ const loadTimeline = async origin => {
         // console.log(renote);
       }
       if (autoShowNew.renote) {
-        await appendToTimeline(renoteList, note);//RN
+        await appendToTimeline(renoteList, note); //RN
       } else {
-        stored.renotes.push(note);//RN
+        stored.renotes.push(note); //RN
         // console.log('renote pushed, stored renotes count:',stored.renotes.length);
         if (stored.renotes.length > noteLimit) {
           stored.renotes = stored.renotes.slice(-noteLimit);
@@ -339,7 +381,7 @@ const loadTimeline = async origin => {
       if (autoShowNew.rnMedium) {
         await appendToTimeline(rnMediaList, note);
       } else {
-        const deleteIndex = stored.rnMedia.findIndex(storedNote => storedNote.renoteId === note.renoteId);
+        const deleteIndex = stored.rnMedia.findIndex((storedNote) => storedNote.renoteId === note.renoteId);
         if (deleteIndex !== -1) {
           stored.rnMedia.splice(deleteIndex, 1);
         }
@@ -350,91 +392,112 @@ const loadTimeline = async origin => {
         }
       }
     }
-  }
+  };
 
-  const apiTimelineEndpoints = ['timeline','local-timeline','hybrid-timeline','global-timeline'];
-  const cli = new misskeyApi.APIClient({origin: origin, ...(authInfo && {credential: authInfo.token})});
-  await cli.request(`notes/${apiTimelineEndpoints[timelineIndex]}`, {limit: 15})
+  const apiTimelineEndpoints = ['timeline', 'local-timeline', 'hybrid-timeline', 'global-timeline'];
+  const cli = new misskeyApi.APIClient({
+    origin: origin,
+    ...(authInfo && { credential: authInfo.token }),
+  });
+  await cli
+    .request(`notes/${apiTimelineEndpoints[timelineIndex]}`, { limit: 15 })
     .then(async (notes) => {
       notes = notes.reverse();
       let p = Promise.resolve();
-      notes.forEach(note => p = p.then(() => parseNote(note)));
+      notes.forEach((note) => (p = p.then(() => parseNote(note))));
       await p;
-    }).catch((e) => {
+    })
+    .catch((e) => {
       console.log(`${host}\'s`, `notes/${apiTimelineEndpoints[timelineIndex]}`, 'could not load');
       console.dir(e);
-  });
+    });
   // console.log(noteList.children.length + renoteList.children.length);
 
   hTimeline.on('note', parseNote);
 
-  const latestBtnHandler = async e => {
+  const latestBtnHandler = async (e) => {
     const latestBtn = e.target;
     latestBtn.textContent = '読み込み中...';
     if (latestBtn === notelatestBtn) {
       autoShowNew.note = true;
-      await appendToTimeline(noteList, stored.notes);//RN以外
+      await appendToTimeline(noteList, stored.notes); //RN以外
     } else if (latestBtn === renotelatestBtn) {
       autoShowNew.renote = true;
-      await appendToTimeline(renoteList, stored.renotes);//RN
+      await appendToTimeline(renoteList, stored.renotes); //RN
     } else if (latestBtn === mediumlatestBtn) {
       autoShowNew.medium = true;
-      await appendToTimeline(mediaList, stored.media);//Media
+      await appendToTimeline(mediaList, stored.media); //Media
     } else if (latestBtn === rnMediumlatestBtn) {
       autoShowNew.rnMedium = true;
-      await appendToTimeline(rnMediaList, stored.rnMedia);//RNMedia
+      await appendToTimeline(rnMediaList, stored.rnMedia); //RNMedia
     }
     latestBtn.classList.remove('show');
     latestBtn.textContent = '新しいノートを見る';
-  }
+  };
 
-  notelatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
-  renotelatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
-  mediumlatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
-  rnMediumlatestBtn.addEventListener('click', latestBtnHandler, {signal: controller.signal});
+  notelatestBtn.addEventListener('click', latestBtnHandler, {
+    signal: controller.signal,
+  });
+  renotelatestBtn.addEventListener('click', latestBtnHandler, {
+    signal: controller.signal,
+  });
+  mediumlatestBtn.addEventListener('click', latestBtnHandler, {
+    signal: controller.signal,
+  });
+  rnMediumlatestBtn.addEventListener('click', latestBtnHandler, {
+    signal: controller.signal,
+  });
 
-  containers.forEach(container => {
-    container.addEventListener('scroll', async e => {
-      const latestBtn = container.querySelector('button[id$="-latest"]');
-      const containerRole = container.classList.contains('notes')    ? 'notes'
-                          : container.classList.contains('renotes')  ? 'renotes'
-                          : container.classList.contains('media')    ? 'media'
-                          : container.classList.contains('rn-media') ? 'rn-media'
-                                                                      : null;
-      // console.log('scrolled: '+ containerRole);
-      if (containerRole === 'notes' || containerRole === 'renotes') {
-        if (container.scrollHeight - container.clientHeight - container.scrollTop >= 3) {
-          autoShowNew[containerRole.slice(0,-1)] = false;
-          latestBtn.classList.add('show');
-        } else {
-          if (stored[containerRole].length) {
-            if (containerRole === 'notes') {
-              await appendToTimeline(noteList, stored.notes);//RN以外
-            } else if (containerRole === 'renotes') {
-              await appendToTimeline(renoteList, stored.renotes);//RN
-            }
+  containers.forEach((container) => {
+    container.addEventListener(
+      'scroll',
+      async (e) => {
+        const latestBtn = container.querySelector('button[id$="-latest"]');
+        const containerRole = container.classList.contains('notes')
+          ? 'notes'
+          : container.classList.contains('renotes')
+            ? 'renotes'
+            : container.classList.contains('media')
+              ? 'media'
+              : container.classList.contains('rn-media')
+                ? 'rn-media'
+                : null;
+        // console.log('scrolled: '+ containerRole);
+        if (containerRole === 'notes' || containerRole === 'renotes') {
+          if (container.scrollHeight - container.clientHeight - container.scrollTop >= 3) {
+            autoShowNew[containerRole.slice(0, -1)] = false;
+            latestBtn.classList.add('show');
           } else {
-            autoShowNew[containerRole.slice(0,-1)] = true;
+            if (stored[containerRole].length) {
+              if (containerRole === 'notes') {
+                await appendToTimeline(noteList, stored.notes); //RN以外
+              } else if (containerRole === 'renotes') {
+                await appendToTimeline(renoteList, stored.renotes); //RN
+              }
+            } else {
+              autoShowNew[containerRole.slice(0, -1)] = true;
+              latestBtn.classList.remove('show');
+            }
+          }
+        } else if (containerRole === 'media' || containerRole === 'rn-media') {
+          if (container.scrollTop > 1) {
+            autoShowNew[(containerRole === 'media' && 'medium') || (containerRole === 'rn-media' && 'rnMedium')] = false;
+            latestBtn.classList.add('show');
+          } else {
+            if (stored[(containerRole === 'media' && 'media') || (containerRole === 'rn-media' && 'rnMedia')].length) {
+              if (containerRole === 'media') {
+                await appendToTimeline(mediaList, stored.media); //Media
+              } else if (containerRole === 'rn-media') {
+                await appendToTimeline(rnMediaList, stored.rnMedia); //RNMedia
+              }
+            }
+            autoShowNew[(containerRole === 'media' && 'medium') || (containerRole === 'rn-media' && 'rnMedium')] = true;
             latestBtn.classList.remove('show');
           }
         }
-      } else if (containerRole === 'media' || containerRole === 'rn-media') {
-        if (container.scrollTop > 1) {
-          autoShowNew[containerRole === 'media' && 'medium' || containerRole === 'rn-media' && 'rnMedium'] = false;
-          latestBtn.classList.add('show');
-        } else {
-          if (stored[containerRole === 'media' && 'media' || containerRole === 'rn-media' && 'rnMedia'].length) {
-            if (containerRole === 'media') {
-              await appendToTimeline(mediaList, stored.media);//Media
-            } else if (containerRole === 'rn-media') {
-              await appendToTimeline(rnMediaList, stored.rnMedia);//RNMedia
-            }
-          }
-          autoShowNew[containerRole === 'media' && 'medium' || containerRole === 'rn-media' && 'rnMedium'] = true;
-          latestBtn.classList.remove('show');
-        }
-      }
-    }, {signal: controller.signal});
+      },
+      { signal: controller.signal }
+    );
   });
 
   const confirmSensitive = () => {
@@ -444,25 +507,29 @@ const loadTimeline = async origin => {
 
     confirmSensitive.classList.add('show');
     buttons[0].focus();
-    [...buttons].forEach(button => {
-      button.addEventListener('click', e => {
-        if (e.target.value === 'yes') {
-          runResolve(true);
-        } else if (e.target.value === 'no') {
-          runResolve(false);
-        }
-        confirmSensitive.classList.remove('show');
-      }, {signal: controller.signal});
+    [...buttons].forEach((button) => {
+      button.addEventListener(
+        'click',
+        (e) => {
+          if (e.target.value === 'yes') {
+            runResolve(true);
+          } else if (e.target.value === 'no') {
+            runResolve(false);
+          }
+          confirmSensitive.classList.remove('show');
+        },
+        { signal: controller.signal }
+      );
     });
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       runResolve = resolve;
     });
-  }
+  };
 
   let asked = false;
   if (localStorage.getItem('tlDisplay')) {
     const tlDisplay = localStorage.getItem('tlDisplay');
-    if (tlDisplay === '2'/* sensitive only */) {
+    if (tlDisplay === '2' /* sensitive only */) {
       const passed = await confirmSensitive();
       selectDisplay.value = passed ? tlDisplay : tlDisplay - 1;
       if (passed) {
@@ -475,54 +542,66 @@ const loadTimeline = async origin => {
   }
   let sdIndexCache = selectDisplay.value;
   grid.classList.add(tlDisplayClassNames[sdIndexCache]);
-  selectDisplay.addEventListener('pointerdown', () => {
-    sdValue.textContent = sdValueStrings[sdIndexCache];
-  }, {once: true, signal: controller.signal});
-  selectDisplay.addEventListener('input', async () => {
-    if (selectDisplay.value === '2'/* sensitive only */ && !asked) {
-      const passed = await confirmSensitive();
-      if (!passed) {
-        selectDisplay.value = sdIndexCache;
-        return;
-      } else {
-        asked = true;
+  selectDisplay.addEventListener(
+    'pointerdown',
+    () => {
+      sdValue.textContent = sdValueStrings[sdIndexCache];
+    },
+    { once: true, signal: controller.signal }
+  );
+  selectDisplay.addEventListener(
+    'input',
+    async () => {
+      if (selectDisplay.value === '2' /* sensitive only */ && !asked) {
+        const passed = await confirmSensitive();
+        if (!passed) {
+          selectDisplay.value = sdIndexCache;
+          return;
+        } else {
+          asked = true;
+        }
       }
-    }
-    if (selectDisplay.value !== '0') {
-      localStorage.setItem('tlDisplay', selectDisplay.value);
-    } else {
-      localStorage.removeItem('tlDisplay');
-    }
-    grid.classList.add(tlDisplayClassNames[selectDisplay.value]);
-    sdValue.textContent = sdValueStrings[selectDisplay.value];
-    grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
-    sdIndexCache = selectDisplay.value;
-    if (autoShowNew.note) {
-      scrollToBottom(noteList.parentElement);
-    }
-    if (autoShowNew.renote) {
-      scrollToBottom(renoteList.parentElement);
-    }
-    if ([...mediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
-      mediaMG.positionItems();
-    }
-    if ([...rnMediaList.children].some(elem => getComputedStyle(elem).display !== 'none')) {
-      rnMediaMG.positionItems();
-    }
-  }, {signal: controller.signal});
+      if (selectDisplay.value !== '0') {
+        localStorage.setItem('tlDisplay', selectDisplay.value);
+      } else {
+        localStorage.removeItem('tlDisplay');
+      }
+      grid.classList.add(tlDisplayClassNames[selectDisplay.value]);
+      sdValue.textContent = sdValueStrings[selectDisplay.value];
+      grid.classList.remove(tlDisplayClassNames[sdIndexCache]);
+      sdIndexCache = selectDisplay.value;
+      if (autoShowNew.note) {
+        scrollToBottom(noteList.parentElement);
+      }
+      if (autoShowNew.renote) {
+        scrollToBottom(renoteList.parentElement);
+      }
+      if ([...mediaList.children].some((elem) => getComputedStyle(elem).display !== 'none')) {
+        mediaMG.positionItems();
+      }
+      if ([...rnMediaList.children].some((elem) => getComputedStyle(elem).display !== 'none')) {
+        rnMediaMG.positionItems();
+      }
+    },
+    { signal: controller.signal }
+  );
 
-  document.addEventListener('keydown', (event) => {
-    const keyName = event.key;
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      const keyName = event.key;
 
-    if (keyName === 'Escape') {
-      hTimeline.dispose();
-      wakeLock !== null && wakeLock.release()
-      .then(() => {
-        wakeLock = null;
-      });
-      alert('Escキーが押されたため、タイムラインの受信を停止しました。');
-    }
-  }, {signal: controller.signal});
+      if (keyName === 'Escape') {
+        hTimeline.dispose();
+        wakeLock !== null &&
+          wakeLock.release().then(() => {
+            wakeLock = null;
+          });
+        alert('Escキーが押されたため、タイムラインの受信を停止しました。');
+      }
+    },
+    { signal: controller.signal }
+  );
 
   loadTimeline.notesScrollToBottom = () => {
     if (autoShowNew.note) {
@@ -536,103 +615,90 @@ const loadTimeline = async origin => {
   loadTimeline.dispose = () => {
     hTimeline.dispose();
     controller.abort();
-    [noteList, renoteList, mediaList, rnMediaList].forEach(elem => {
+    [noteList, renoteList, mediaList, rnMediaList].forEach((elem) => {
       elem.textContent = '';
     });
-    [mediaList, rnMediaList].forEach(elem => {
+    [mediaList, rnMediaList].forEach((elem) => {
       elem.removeAttribute('style');
     });
-  }
+  };
 };
 await loadTimeline(currentOrigin);
 
-const gridClientHeight = grid.clientHeight;
-const headerHeight = 56;
-if (localStorage.getItem('tlGridHorizontalRatio')) {
-  const ratio = localStorage.getItem('tlGridHorizontalRatio');
-  const contentsHeight = gridClientHeight - headerHeight;
-  const contentsPercentage = contentsHeight / gridClientHeight;
-  const gridPercent = ratio * contentsPercentage;
-  grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
-  mediaContainers.forEach(container => {
-    container.style.paddingBottom = `${(contentsPercentage * 100 - gridPercent) * (gridClientHeight / window.innerHeight)}dvh`;
-  });
-}
-const onPointerLeave = () => {
-  resizeHandle.classList.remove('hover');
-}
-resizeHandle.addEventListener('pointerenter', () => {
-  resizeHandle.classList.add('hover');
-});
-resizeHandle.addEventListener('pointerleave', onPointerLeave);
-resizeHandle.addEventListener('pointerdown', e => {
-  resizeHandle.removeEventListener('pointerleave', onPointerLeave);
-  const onPointerMove = e => {
-    const gridClientHeight = grid.clientHeight;
-    const pointerY = Math.round(e.pageY);
-    const contentsHeight = gridClientHeight - headerHeight;
-    const contentsPercentage = contentsHeight / gridClientHeight;
-    const contentsPointerY = pointerY - headerHeight;
-    if (!e.isPrimary || contentsPointerY < 0 || contentsPointerY > contentsHeight ) {
-        return;
-    }
-    const gridHorizontalCenter = contentsHeight / 2;
-    const diffFromCenter = contentsPointerY - gridHorizontalCenter
-    const nearTheMiddle = diffFromCenter <= 15 && diffFromCenter >= -15;
-    let ratio;
-    if(nearTheMiddle) {
-      grid.removeAttribute('style');
-      localStorage.removeItem('tlGridHorizontalRatio');
-      mediaContainers.forEach(container => {
-        container.removeAttribute('style');
-      });
-      loadTimeline.notesScrollToBottom();
-      return;
-    } else if (contentsPointerY <= 15) {
-      ratio = 0;
-    } else if (contentsHeight - contentsPointerY <= 15) {
-      ratio = 100;
-    } else {
-      ratio = (contentsPointerY / contentsHeight) * 100;
-    }
-    const gridPercent = ratio * contentsPercentage;
-    grid.style.gridTemplateRows = `${headerHeight}px ${gridPercent}% ${contentsPercentage * 100 - gridPercent}%`;
-    localStorage.setItem('tlGridHorizontalRatio', ratio);
-    mediaContainers.forEach(container => {
-      container.style.paddingBottom = `${(contentsPercentage * 100 - gridPercent) * (gridClientHeight / window.innerHeight)}dvh`;
+const setupResizeHandle = () => {
+  const headerHeight = 56;
+  const getContentsHeight = () => grid.clientHeight - headerHeight;
+  const getContentsRatio = () => (getContentsHeight() / grid.clientHeight) * 100;
+  const setResize = (ratio) => {
+    grid.style.gridTemplateRows = `${headerHeight}px ${ratio}fr ${100 - ratio}fr`;
+    mediaContainers.forEach((container) => {
+      container.style.paddingBottom = `${getContentsRatio() - (ratio * getContentsRatio()) / 100}dvh`;
     });
+  };
+  const resetResize = () => {
+    grid.removeAttribute('style');
+    mediaContainers.forEach((container) => {
+      container.removeAttribute('style');
+    });
+    localStorage.removeItem('tlGridHorizontalRatio');
     loadTimeline.notesScrollToBottom();
-  }
-  document.addEventListener('pointermove', onPointerMove);
-  const onPointerUp = e => {
-    if (e.isPrimary) {
-      resizeHandle.classList.remove('hover');
-      document.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('pointerup', onPointerUp);
-      resizeHandle.addEventListener('pointerleave', onPointerLeave);
-    }
-  }
-  document.addEventListener('pointerup', onPointerUp);
-});
-resizeHandle.addEventListener('dblclick', () => {
-  grid.removeAttribute('style');
-  localStorage.removeItem('tlGridHorizontalRatio');
-  mediaContainers.forEach(container => {
-    container.removeAttribute('style');
-  });
-  loadTimeline.notesScrollToBottom();
-});
+  };
 
-const overlayPointerdownHandler = e => {
+  if (localStorage.getItem('tlGridHorizontalRatio')) {
+    const ratio = localStorage.getItem('tlGridHorizontalRatio');
+    setResize(ratio);
+  }
+  let isResizing = false;
+  resizeHandle.addEventListener('pointerdown', (e) => {
+    isResizing = true;
+    resizeHandle.setPointerCapture(e.pointerId);
+  });
+  resizeHandle.addEventListener('pointermove', (e) => {
+    if (!isResizing) {
+      return;
+    }
+    const y = e.clientY - headerHeight;
+    const contentsPointerRatio = (y / getContentsHeight()) * 100;
+    if (!e.isPrimary || contentsPointerRatio < 0 || contentsPointerRatio > 100) {
+      return;
+    }
+    const defaultPoint = 50;
+    const snapPoints = [0, defaultPoint, 100];
+    const snapY = snapPoints.map((point) => (getContentsHeight() * point) / 100);
+    const snapThreshold = 15;
+    const foundSnapPoint = snapPoints.find((_, index) => Math.abs(y - snapY[index]) <= snapThreshold) ?? null;
+    if (foundSnapPoint === defaultPoint) {
+      resetResize();
+      return;
+    }
+    let ratio;
+    if (foundSnapPoint !== null) {
+      ratio = foundSnapPoint;
+    } else {
+      ratio = contentsPointerRatio;
+    }
+    setResize(ratio);
+    localStorage.setItem('tlGridHorizontalRatio', ratio);
+  });
+  document.addEventListener('pointerup', (e) => {
+    if (e.isPrimary) {
+      isResizing = false;
+    }
+  });
+  resizeHandle.addEventListener('dblclick', resetResize);
+};
+setupResizeHandle();
+
+const overlayPointerdownHandler = (e) => {
   if (!e.target.closest('.config') && !e.target.closest('.confirm-sensitive')) {
     body.classList.remove('show-config');
     body.removeEventListener('pointerdown', overlayPointerdownHandler);
   }
-}
-menuBtn.addEventListener('pointerdown', e => {
+};
+menuBtn.addEventListener('pointerdown', (e) => {
   e.stopPropagation();
 });
-menuBtn.addEventListener('click', e => {
+menuBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   body.classList.toggle('show-config');
   if (body.classList.contains('show-config')) {
@@ -648,7 +714,7 @@ selectTimeline.addEventListener('change', async () => {
   await loadTimeline(currentOrigin);
 });
 
-customHostForm.addEventListener('submit', async e => {
+customHostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loadTimeline.dispose();
   customHost.value = normalizeHostInput(customHost.value);
