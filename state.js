@@ -29,6 +29,12 @@ export const createAppState = () => {
       domRefs.customHost.value = '';
       domRefs.configFrame.classList.remove('customized-host');
     }
+    if (localStorage.getItem('tlIndex')) {
+      state.timelineIndex = parseInt(localStorage.getItem('tlIndex'), 10);
+    } else {
+      state.timelineIndex = 1;
+    }
+    domRefs.selectTimeline.value = state.timelineIndex;
     domRefs.misskeyLink.querySelector('a').href = state.currentOrigin;
     domRefs.keepEmojis.checked = !!localStorage.getItem(`tlEmojis${state.host}`);
     return state;
@@ -39,17 +45,19 @@ export const createAppState = () => {
     if (authInfo) {
       const disabledOptions = domRefs.selectTimeline.querySelectorAll(':disabled');
       disabledOptions.forEach(option => (option.disabled = false));
-      state.timelineIndex = 0;
       domRefs.authenticateLabel.textContent = `@${authInfo.user.username}に接続`;
       domRefs.authenticateBtn.textContent = '切断';
     } else {
       const disabledOptions = domRefs.selectTimeline.querySelectorAll('[value="0"], [value="2"]');
       disabledOptions.forEach(option => (option.disabled = true));
-      state.timelineIndex = 1;
+      if (state.timelineIndex === 0 || state.timelineIndex === 2) {
+        state.timelineIndex = 1;
+        domRefs.selectTimeline.value = state.timelineIndex;
+        localStorage.removeItem('tlIndex');
+      }
       domRefs.authenticateLabel.textContent = '認証してHTLとSTLも見る';
       domRefs.authenticateBtn.textContent = '認証';
     }
-    domRefs.selectTimeline.value = state.timelineIndex;
     return state;
   };
 

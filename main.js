@@ -707,6 +707,7 @@ menuBtn.addEventListener('click', (e) => {
 selectTimeline.addEventListener('change', async () => {
   loadTimeline.dispose();
   timelineIndex = Number(selectTimeline.value);
+  localStorage.setItem('tlIndex', timelineIndex);
   await loadTimeline(currentOrigin);
 });
 
@@ -731,6 +732,7 @@ customHostForm.addEventListener('submit', async (e) => {
   authInfo = authManager.checkToken(host);
   appState.initAuth(authInfo, domRefs);
   timelineIndex = appState.state.timelineIndex;
+  localStorage.setItem('tlIndex', timelineIndex);
   keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   await loadTimeline(currentOrigin);
 });
@@ -748,6 +750,7 @@ resetHostBtn.addEventListener('click', async () => {
   authInfo = authManager.checkToken(host);
   appState.initAuth(authInfo, domRefs);
   timelineIndex = appState.state.timelineIndex;
+  localStorage.setItem('tlIndex', timelineIndex);
   keepEmojis.checked = !!localStorage.getItem(`tlEmojis${host}`);
   await loadTimeline(currentOrigin);
 });
@@ -759,6 +762,7 @@ authenticateBtn.addEventListener('click', async () => {
     authInfo = null;
     appState.initAuth(authInfo, domRefs);
     timelineIndex = appState.state.timelineIndex;
+    localStorage.setItem('tlIndex', timelineIndex);
     await loadTimeline(currentOrigin);
   } else {
     goMiAuth(host);
