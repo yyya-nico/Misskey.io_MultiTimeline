@@ -453,15 +453,8 @@ const loadTimeline = async (origin) => {
       'scroll',
       async (e) => {
         const latestBtn = container.querySelector('button[id$="-latest"]');
-        const containerRole = container.classList.contains('notes')
-          ? 'notes'
-          : container.classList.contains('renotes')
-            ? 'renotes'
-            : container.classList.contains('media')
-              ? 'media'
-              : container.classList.contains('rn-media')
-                ? 'rn-media'
-                : null;
+        const roles = ['notes', 'renotes', 'media', 'rn-media'];
+        const containerRole = roles.find((role) => container.classList.contains(role));
         // console.log('scrolled: '+ containerRole);
         if (containerRole === 'notes' || containerRole === 'renotes') {
           if (container.scrollHeight - container.clientHeight - container.scrollTop >= 3) {
