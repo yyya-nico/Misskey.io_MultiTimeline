@@ -17,5 +17,8 @@
     "magic-grid": "github:yyya-nico/Magic-Grid",
     "mfm-js": "^0.24.0",
     "misskey-js": "^2026.1.0-beta.0"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.3"
   }
 }
